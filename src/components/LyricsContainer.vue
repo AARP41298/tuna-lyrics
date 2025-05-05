@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import {onBeforeUnmount, ref, watch} from "vue";
 import {hasJapaneseInString, hasKoreanInString} from "src/plugins/synced-lyrics/renderer/utils";
 
 
@@ -44,15 +44,22 @@ watch(searchResult, (newRes) => {
   }
 })
 
-
 function fetch_data() {
+  const startTime = performance.now();
   fetch(FETCH_URL)
     .then(response => response.json())
     .then(async data => {
+      const endTime = performance.now();
+      const lag = endTime - startTime;
+      const predictedTime = data['progress'] + lag;
       // data now contains the json object with song metadata
-      currentTime.value = data['progress'];
+      const diffTime = currentTime.value - predictedTime
+      if (Math.abs(diffTime) > 1000) {
+        currentTime.value = predictedTime + 600;
+      }
 
       if (data['title'] != title.value) {
+        document.documentElement.scrollTo({top: 0, behavior: "smooth"});
         title.value = data['title'];
         alternativeTitle.value = data['alternativeTitle'];
         //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
@@ -95,19 +102,26 @@ function fetch_data() {
 
 }
 
-setInterval(fetch_data, REFRESH_INTERVAL_MS);
-setInterval(() => {
+const requestInteral = setInterval(fetch_data, REFRESH_INTERVAL_MS);
+const localInterval = setInterval(() => {
   if (status.value !== "playing") {
     return;
   }
-}, 100);
+  currentTime.value = currentTime.value + 50;
+}, 50);
 
+onBeforeUnmount(() => {
+  clearInterval(requestInteral);
+  clearInterval(localInterval);
+})
 
 </script>
 
 <template>
-  <div class="lyric-container">
-    lyrics container
+  <div
+    class="lyric-container row justify-center"
+    style="padding-top: 50vh; padding-bottom: 50vh"
+  >
     <LoadingKaomoji v-if="fetching==='fetching'"/>
     <div v-else-if="!lines && !lyrics"
          class="text-lyrics description ytmusic-description-shelf-renderer"
@@ -119,18 +133,17 @@ setInterval(() => {
     </div>
 
     <div v-else-if="lines">
-      <SyncedLine v-for="(l, i) in lines" :key="i"
-                  :line="l"
-                  :hasJapanese="hasJapanese"
-                  :hasKorean="hasKorean"
-                  :current="currentTime"
+      <SyncedLine
+        v-for="(l, i) in lines" :key="i"
+        :line="l"
+        :hasJapanese="hasJapanese"
+        :hasKorean="hasKorean"
+        :current="currentTime"
+        :durationMs="durationMs"
       />
     </div>
   </div>
 </template>
 
 <style scoped>
-.lyric-container {
-  padding-top: 16px;
-}
 </style>

@@ -1,4 +1,6 @@
 /* Hides the original lyrics, to only show our own.  */
+
+
 #tab-renderer[page-type='MUSIC_PAGE_TYPE_TRACK_LYRICS'] > * {
     display: none !important;
 }
@@ -21,6 +23,11 @@
 
 /* Variables are overridden by selected line effect */
 :root {
+    /*Taken from YTM*/
+    --ytmusic-body-line-height: 1.4;
+    --ytmusic-text-secondary: var(--ytmusic-color-grey2);
+    --ytmusic-color-grey2: #aaa;
+    --ytmusic-color-grey5: #606060;
     /* Layout */
     --global-margin: 0.7rem;
     --lyrics-padding: 0;
@@ -52,7 +59,7 @@
     lyrics-wobble var(--lyrics-wobble-duration) forwards;
     --lyrics-scale-duration: 0.166s;
     --lyrics-opacity-transition: 0.33s;
-    --lyrics-glow-duration: var(--lyrics-duration);
+    --lyrics-glow-duration: var(2s);
     --lyrics-wobble-duration: calc(var(--lyrics-duration) / 2);
 
     /* Colors */
@@ -215,7 +222,7 @@
 
 .lyrics-renderer-sticky {
     position: sticky;
-    top: var(--top, 0);
+    /*top: var(--top, 0);*/
     z-index: 100;
     backdrop-filter: blur(5px);
 

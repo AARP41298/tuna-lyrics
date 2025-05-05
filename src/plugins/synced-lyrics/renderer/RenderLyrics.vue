@@ -3,13 +3,14 @@
 
 import LyricsContainer from "components/LyricsContainer.vue";
 
-import {watchEffect} from "vue";
+import {onMounted} from "vue";
 
 const config = () => ({
   enabled: true,
   lineEffect: 'fancy', // ejemplo
 });
-watchEffect(() => {
+// watchEffect(() => {
+onMounted(() => {
   if (!config().enabled) return;
 
   const root = document.documentElement;
@@ -110,7 +111,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="lyrics-renderer">
+  <div class="lyrics-renderer"
+  style="overflow: hidden;
+  margin: 0;
+  padding: 0;">
     <LyricsContainer/>
   </div>
 </template>

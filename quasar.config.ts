@@ -102,7 +102,7 @@ export default defineConfig((ctx) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {
-        dark:'auto'//for develop
+        // dark:'auto'//for develop
       },
 
       // iconSet: 'material-icons', // Quasar icon set
