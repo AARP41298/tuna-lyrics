@@ -44,7 +44,7 @@ const opacity = computed(() => {
 
   const logNorm = Math.log1p(t * 9) / Math.log1p(9);
 
-  return Math.max(logNorm, 0.05);
+  return Math.max(logNorm, 0.00);
 });
 
 const refLine = ref<HTMLDivElement | undefined>(undefined);
