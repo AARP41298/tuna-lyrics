@@ -177,6 +177,7 @@ export class LRCLib implements LyricProvider {
           }))
           : undefined,
         lyrics: plain,
+        duration: closestResult.duration,
       };
     }
 

@@ -29,6 +29,8 @@ export interface LyricResult {
 
   lyrics?: string;
   lines?: LineLyrics[] | undefined;
+
+  duration?: number;
 }
 
 // prettier-ignore

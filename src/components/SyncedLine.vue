@@ -44,18 +44,52 @@ const opacity = computed(() => {
 
   const logNorm = Math.log1p(t * 9) / Math.log1p(9);
 
-  return Math.max(logNorm, 0.00);
+  //todo: just debug, return to 0
+  return Math.max(logNorm, 0);
 });
 
-const refLine = ref<HTMLDivElement | undefined>(undefined);
-watch(status, () => {
-  if (status.value === 'current') {
-    refLine.value?.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    })
+const wordRefs = ref<(HTMLElement | null)[]>([])
+const setWordRef = (el: unknown, index: number) => {
+  wordRefs.value[index] = el as HTMLElement
+}
+
+const baseFont = 3; // rem
+const maxFont = 4;  // rem
+const wordDelay = 100; // ms entre inicios de palabras
+const growTime = 100; // ms que tarda en llegar al max
+
+watch(
+  () => props.current,
+  (current) => {
+    wordRefs.value.forEach((el, index) => {
+      if (!el) return;
+      if (status.value !== 'current'){
+        el.style.fontSize = `${baseFont}rem`;
+        return;
+      }
+      console.log('word',el.textContent)
+
+      const startTime = props.line.timeInMs + index * wordDelay;
+      const endTime = startTime + growTime;
+
+      let fontSize = baseFont;
+
+      if (current >= startTime) {
+        if (current <= endTime) {
+          // Progreso de 0 a 1 durante el crecimiento
+          const t = (current - startTime) / growTime;
+          fontSize = baseFont + (maxFont - baseFont) * t;
+        } else {
+          // Ya creció al máximo → mantener en 4rem
+          fontSize = maxFont;
+        }
+      }
+      console.log('fontSize',fontSize)
+      el.style.fontSize = `${fontSize}rem`;
+    });
   }
-})
+);
+
 
 const text = computed(() => {
   if (!props.line.text.trim()) {
@@ -94,15 +128,6 @@ onMounted(async () => {
   }
 })
 
-onMounted(() => {
-  if (durationDiv.value) {
-    durationDiv.value.style.setProperty(
-      '--lyrics-duration',
-      `${props.line.duration / 1000}s`,
-      'important'
-    );
-  }
-})
 
 
 function goToTime() {
@@ -131,13 +156,13 @@ function goToTime() {
          -->
         <!--         TODO: Investigate the animation, even though the duration is properly set, all lines have the same animation duration-->
         <div
-          class="text-lyrics"
+          class="text-lyrics texto-con-borde-grueso"
           ref="durationDiv"
         >
         <span :class="'row justify-center ' +small">
           <span v-for="(word, index) in text.split(' ')" :key="index"
-                :style="{ 'transition-delay': `${index * 0.05}s`,
-                      'animation-delay': `${index * 0.05}s`,}">
+                :ref="el=>setWordRef(el,index)"
+                >
 <!--                      <yt-formatted-string>-->
                 {{ word }}&ensp;
             <!--                      </yt-formatted-string>-->
@@ -168,20 +193,19 @@ function goToTime() {
 <style scoped lang="scss">
 .current {
   font-weight: bold;
-  font-size: 4rem;
-  -webkit-text-stroke: .5rem black;
+  //font-size: 4rem;
+
 }
 
 .upcoming, .previous {
   font-weight: normal;
-  font-size: 3rem;
-  -webkit-text-stroke: .2rem black;
+  //font-size: 3rem;
+
 }
 
 .upcoming, .previous, .current {
   font-family: Verdana, sans-serif;
   color: white;
-  text-shadow: .5rem .5rem .5rem black;
   paint-order: stroke fill;
 
 }
@@ -189,7 +213,23 @@ function goToTime() {
 .small {
   font-size: 2rem;
   -webkit-text-stroke: .3rem black;
+}
 
+@mixin text-outline($width: 2px, $color: black) {
+  $shadows: ();
+
+  @for $i from -$width through $width {
+    @for $j from -$width through $width {
+      $shadows: append($shadows, #{$i}px #{$j}px 0 $color, comma);
+    }
+  }
+
+  text-shadow: $shadows;
+}
+
+.texto-con-borde-grueso {
+  color: white;
+  @include text-outline(3, black); /* 3px de grosor */
 }
 
 </style>

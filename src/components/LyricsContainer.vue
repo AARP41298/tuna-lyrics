@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeUnmount, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {hasJapaneseInString, hasKoreanInString} from "src/plugins/synced-lyrics/renderer/utils";
 
 
@@ -8,6 +8,8 @@ import LoadingKaomoji from "components/LoadingKaomoji.vue";
 import SyncedLine from "components/SyncedLine.vue";
 import {LRCLib} from "src/plugins/synced-lyrics/providers/LRCLib";
 import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
+import {useRoute} from "vue-router";
+import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
 
 const hasJapanese = ref(false);
 const hasKorean = ref(false);
@@ -32,7 +34,8 @@ const lyrics = ref<string | undefined>('');
 const searchResult = ref<LyricResult | null>(null);
 
 const LRCLibClass = new LRCLib();
-const REFRESH_INTERVAL_MS = 1000;
+
+const route = useRoute();
 
 
 watch(searchResult, (newRes) => {
@@ -46,22 +49,23 @@ watch(searchResult, (newRes) => {
   }
 })
 
-function fetch_data() {
-  const startTime = performance.now();
-  fetch(FETCH_URL)
+async function fetch_data(debugIdx = 'none') {
+  console.log('fetch_data', debugIdx)
+  const test = await fetch(FETCH_URL)
     .then(response => response.json())
     .then(async data => {
-      const endTime = performance.now();
-      const lag = endTime - startTime;
-      const predictedTime = (data['elapsedSeconds'] * 1000) + lag;
+      console.log('obtubo cancion', debugIdx)
       // data now contains the json object with song metadata
-      const diffTime = currentTime.value - predictedTime
-      if (Math.abs(diffTime) > 2000) {
-        currentTime.value = predictedTime + 600;
+
+      const debugTime = Array.isArray(route.query.debugTime)
+        ? route.query.debugTime[0] ?? ''
+        : route.query.debugTime ?? ''
+      if (debugTime) {
+        currentTime.value = parseInt(debugTime) * 1000
       }
 
       if (data['title'] != title.value) {
-        document.documentElement.scrollTo({top: 0, behavior: "smooth"});
+        console.log('el titulo cambio', debugIdx)
         title.value = data['title'];
         alternativeTitle.value = data['alternativeTitle'];
         //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
@@ -81,53 +85,152 @@ function fetch_data() {
         //en vez de buscar, el ID de la cancion
         // https://lrclib.net/api/get/3396226
 
-        searchResult.value = await LRCLibClass.search({
-          title: data['title'],
-          alternativeTitle: data['alternativeTitle'],
-          artist: data['artist'],
-          album: data['album'],
-          songDuration: data['songDuration'],
-          tags: data['tags'],
-          videoId: ''
-        });
+        const lrclibID = Array.isArray(route.query.lrclibid)
+          ? route.query.lrclibid[0] ?? ''
+          : route.query.lrclibid ?? ''
 
+        if (lrclibID) {
+          const idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
+
+          //from LRCLib.ts
+          const raw = idData.syncedLyrics;
+          const plain = idData.plainLyrics;
+
+          searchResult.value = {
+            title: idData.trackName,
+            artists: idData.artistName.split(/[&,]/g),
+            lines: raw
+              ? LRC.parse(raw).lines.map((l) => ({
+                ...l,
+                status: 'upcoming' as const,
+              }))
+              : undefined,
+            lyrics: plain,
+            duration: idData.duration,
+          }
+        } else {
+          searchResult.value = await LRCLibClass.search({
+            title: data['title'],
+            alternativeTitle: data['alternativeTitle'],
+            artist: data['artist'],
+            album: data['album'],
+            songDuration: data['songDuration'],
+            tags: data['tags'],
+            videoId: ''
+          });
+        }
+        console.log('searchResult done')
         fetching.value = 'done'
         if (searchResult.value) {
           lines.value = searchResult.value.lines
           lyrics.value = searchResult.value.lyrics!
         } else {
-          lines.value = undefined
+          lines.value = []
           lyrics.value = undefined
         }
+
+        console.log('lines done', debugIdx)
       }
+      return 'return'
     })
     .catch(function (error) {
       console.error(error);
       // Do nothing
     });
+  console.log('fetch_data done', debugIdx, test)
 
 }
 
-const requestInteral = setInterval(fetch_data, REFRESH_INTERVAL_MS);
-const localInterval = setInterval(() => {
-  if (isPaused.value) {
-    return;
-  }
+// const requestInteral = setInterval(fetch_data, REFRESH_INTERVAL_MS);
+/*const localInterval = setInterval(() => {
   currentTime.value = currentTime.value + 50;
-}, 50);
+}, 50);*/
 
 onBeforeUnmount(() => {
-  clearInterval(requestInteral);
-  clearInterval(localInterval);
+  // clearInterval(requestInteral);
+  // clearInterval(localInterval);
 })
 
+
+declare global {
+  interface Window {
+    getInfo: () => Promise<{ fps: number; numberOfFrames: number }>
+    seekToFrame: (frame: number) => void
+  }
+}
+
+onMounted(() => {
+  window.getInfo = getInfo
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  window.seekToFrame = seekToFrame
+})
+
+const fps = 24
+
+async function getInfo() {
+  console.log('getInfo')
+  await fetch_data('getIn')
+  console.log('getInfo return', searchResult.value)
+  console.log('searchResult.value?.duration', searchResult.value?.duration)
+  return {
+    fps,
+    numberOfFrames: (searchResult.value?.duration || 10) * fps,
+  }
+}
+
+async function seekToFrame(frame: number) {
+  console.log('seekToFrame', frame)
+  await fetch_data('seek')
+  currentTime.value = (frame / fps) * 1000
+  console.log('currentTime', currentTime.value)
+  await nextTick(updateLineHeights)
+
+}
+
+const currentIndex = computed(() => {
+  const checkLines = lines.value ?? [];
+
+  return checkLines.findIndex(l => {
+    return currentTime.value >= l.timeInMs &&
+      currentTime.value < l.timeInMs + l.duration
+  })
+})
+
+const lineHeights = ref<number[]>([])
+const lineRefs = ref<(InstanceType<typeof SyncedLine> | null)[]>([])
+
+const setLinesRef = (el: unknown, index: number) => {
+  lineRefs.value[index] = el as InstanceType<typeof SyncedLine>
+}
+
+function updateLineHeights() {
+  lineHeights.value = lineRefs.value.map(lRef => lRef?.$el.offsetHeight || 0)
+}
+
+onMounted(async () => {
+  await nextTick(updateLineHeights)
+  window.addEventListener('resize', updateLineHeights)
+})
+
+
+const offsetY = computed(() => {
+  const idx = currentIndex.value
+  const prevHeights = lineHeights.value.slice(0, idx)
+  const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
+  const currentHeight = lineHeights.value[idx] || 0
+  return centerOffset - (sumPrev + currentHeight / 2)
+})
+
+const centerOffset = 540 // mitad de 1080p
 </script>
 
 <template>
   <div
     class="lyric-container row justify-center"
-    style="padding-top: 50vh; padding-bottom: 50vh"
-  >
+    :style="{
+        transform: `translateY(${offsetY}px)`,
+        transition: 'transform 0.4s ease-out'
+      }">
     <LoadingKaomoji v-if="fetching==='fetching'"/>
     <div v-else-if="!lines && !lyrics"
          class="text-lyrics description ytmusic-description-shelf-renderer"
@@ -146,6 +249,7 @@ onBeforeUnmount(() => {
         :hasKorean="hasKorean"
         :current="currentTime"
         :durationMs="durationMs"
+        :ref="(el)=>setLinesRef(el, i)"
       />
     </div>
   </div>
