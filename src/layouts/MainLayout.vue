@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import RenderLyrics from "src/plugins/synced-lyrics/renderer/RenderLyrics.vue";
+//todo: height by url
 </script>
 
 <style>

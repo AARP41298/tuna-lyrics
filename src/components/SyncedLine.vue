@@ -53,42 +53,64 @@ const setWordRef = (el: unknown, index: number) => {
   wordRefs.value[index] = el as HTMLElement
 }
 
-const baseFont = 3; // rem
-const maxFont = 4;  // rem
+const romanjiRefs = ref<(HTMLElement | null)[]>([])
+const setRomanjiRef = (el: unknown, index: number) => {
+  romanjiRefs.value[index] = el as HTMLElement
+}
+
+//todo: dinamic rem by resolution
+//small: 2rem
+const baseFont = 4; // 1080->3 1440->4 2160->5
+const maxFont = 5;  // 1080->4 1440->5 2160->6
 const wordDelay = 100; // ms entre inicios de palabras
 const growTime = 100; // ms que tarda en llegar al max
+
+const smallKanji = route.query.smallKanji ?? false
 
 watch(
   () => props.current,
   (current) => {
     wordRefs.value.forEach((el, index) => {
-      if (!el) return;
-      if (status.value !== 'current'){
-        el.style.fontSize = `${baseFont}rem`;
-        return;
-      }
-      console.log('word',el.textContent)
+      popWord(el, index, current, small.value)
+    });
 
-      const startTime = props.line.timeInMs + index * wordDelay;
-      const endTime = startTime + growTime;
-
-      let fontSize = baseFont;
-
-      if (current >= startTime) {
-        if (current <= endTime) {
-          // Progreso de 0 a 1 durante el crecimiento
-          const t = (current - startTime) / growTime;
-          fontSize = baseFont + (maxFont - baseFont) * t;
-        } else {
-          // Ya creció al máximo → mantener en 4rem
-          fontSize = maxFont;
-        }
-      }
-      console.log('fontSize',fontSize)
-      el.style.fontSize = `${fontSize}rem`;
+    romanjiRefs.value.forEach((el, index) => {
+      popWord(el, index, current)
     });
   }
 );
+
+function popWord(el: HTMLElement | null, index: number, current: number, small: string = '') {
+
+  if (!el) return;
+  if (small === 'small') {
+    el.style.fontSize = `${baseFont - 1}rem`;
+    return;
+  }
+  if (status.value !== 'current') {
+    el.style.fontSize = `${baseFont}rem`;
+    return;
+  }
+  console.log('word', el.textContent)
+
+  const startTime = props.line.timeInMs + index * wordDelay;
+  const endTime = startTime + growTime;
+
+  let fontSize = baseFont;
+
+  if (current >= startTime) {
+    if (current <= endTime) {
+      // Progreso de 0 a 1 durante el crecimiento
+      const t = (current - startTime) / growTime;
+      fontSize = baseFont + (maxFont - baseFont) * t;
+    } else {
+      // Ya creció al máximo → mantener en 4rem
+      fontSize = maxFont;
+    }
+  }
+  console.log('fontSize', fontSize)
+  el.style.fontSize = `${fontSize}rem`;
+}
 
 
 const text = computed(() => {
@@ -104,7 +126,6 @@ const text = computed(() => {
 const romanization = ref('')
 
 
-const smallKanji = route.query.smallKanji ?? false
 const showRomanji = ref(false);
 const small = ref('')
 onMounted(async () => {
@@ -159,10 +180,10 @@ function goToTime() {
           class="text-lyrics texto-con-borde-grueso"
           ref="durationDiv"
         >
-        <span :class="'row justify-center ' +small">
+        <span :class="'row justify-center'">
           <span v-for="(word, index) in text.split(' ')" :key="index"
                 :ref="el=>setWordRef(el,index)"
-                >
+          >
 <!--                      <yt-formatted-string>-->
                 {{ word }}&ensp;
             <!--                      </yt-formatted-string>-->
@@ -170,11 +191,10 @@ function goToTime() {
         </span>
 
           <!--        TODO: config()?.romanization-->
-          <span class="romaji row justify-center"
+          <span class="romaji row justify-center texto-con-borde-grueso"
                 v-if="showRomanji">
             <span v-for="(word, index) in romanization.split(' ')" :key="index"
-                  :style="{ 'transition-delay': `${index * 0.05}s`,
-                        'animation-delay': `${index * 0.05}s`,}">
+                  :ref="el=>setRomanjiRef(el,index)">
   <!--                      <yt-formatted-string>-->
                   {{ word }}&ensp;
               <!--                      </yt-formatted-string>-->
@@ -212,7 +232,7 @@ function goToTime() {
 
 .small {
   font-size: 2rem;
-  -webkit-text-stroke: .3rem black;
+  //-webkit-text-stroke: .3rem black;
 }
 
 @mixin text-outline($width: 2px, $color: black) {
