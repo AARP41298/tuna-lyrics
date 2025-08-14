@@ -89,8 +89,19 @@ async function fetch_data(debugIdx = 'none') {
           ? route.query.lrclibid[0] ?? ''
           : route.query.lrclibid ?? ''
 
-        if (lrclibID) {
-          const idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
+        const jsonName = Array.isArray(route.query.json)
+          ? route.query.json[0] ?? ''
+          : route.query.json ?? ''
+
+        if (lrclibID || jsonName) {
+          let idData;
+          if (lrclibID) {
+            idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
+          }
+          if (jsonName) {
+            idData = await (await fetch(`/lrc/${jsonName}.json`)).json();
+          }
+
 
           //from LRCLib.ts
           const raw = idData.syncedLyrics;
