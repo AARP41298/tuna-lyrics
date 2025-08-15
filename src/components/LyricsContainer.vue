@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {hasJapaneseInString, hasKoreanInString} from "src/plugins/synced-lyrics/renderer/utils";
 
 
@@ -10,12 +10,13 @@ import {LRCLib} from "src/plugins/synced-lyrics/providers/LRCLib";
 import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
+import {useHeightStore} from "stores/height";
 
 const hasJapanese = ref(false);
 const hasKorean = ref(false);
 const currentTime = ref(0);
 // const FETCH_URL = 'http://localhost:1608/';
-const FETCH_URL = 'http://localhost:26538/api/v1/song';
+const YT_API = 'http://localhost:26538/api/v1/song';
 
 
 const title = ref('');
@@ -49,12 +50,12 @@ watch(searchResult, (newRes) => {
   }
 })
 
-async function fetch_data(debugIdx = 'none') {
-  console.log('fetch_data', debugIdx)
-  const test = await fetch(FETCH_URL)
+async function fetch_data() {
+
+  //todo: disable YT
+  await fetch(YT_API)
     .then(response => response.json())
     .then(async data => {
-      console.log('obtubo cancion', debugIdx)
       // data now contains the json object with song metadata
 
       const debugTime = Array.isArray(route.query.debugTime)
@@ -65,7 +66,6 @@ async function fetch_data(debugIdx = 'none') {
       }
 
       if (data['title'] != title.value) {
-        console.log('el titulo cambio', debugIdx)
         title.value = data['title'];
         alternativeTitle.value = data['alternativeTitle'];
         //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
@@ -130,7 +130,6 @@ async function fetch_data(debugIdx = 'none') {
             videoId: ''
           });
         }
-        console.log('searchResult done')
         fetching.value = 'done'
         if (searchResult.value) {
           lines.value = searchResult.value.lines
@@ -140,7 +139,6 @@ async function fetch_data(debugIdx = 'none') {
           lyrics.value = undefined
         }
 
-        console.log('lines done', debugIdx)
       }
       return 'return'
     })
@@ -148,7 +146,6 @@ async function fetch_data(debugIdx = 'none') {
       console.error(error);
       // Do nothing
     });
-  console.log('fetch_data done', debugIdx, test)
 
 }
 
@@ -176,25 +173,33 @@ onMounted(() => {
   window.seekToFrame = seekToFrame
 })
 
-const fps = 24
+const fps = ref(24)
+
+onBeforeMount(() => {
+  const fpsQ = Array.isArray(route.query.fps)
+    ? route.query.fps[0] ?? 24
+    : route.query.fps ?? 24
+  fps.value = parseInt(fpsQ.toString())
+})
 
 async function getInfo() {
-  console.log('getInfo')
-  await fetch_data('getIn')
-  console.log('getInfo return', searchResult.value)
-  console.log('searchResult.value?.duration', searchResult.value?.duration)
+  await fetch_data()
+
+
   return {
-    fps,
-    numberOfFrames: (searchResult.value?.duration || 10) * fps,
+    fps: fps.value,
+    numberOfFrames: (searchResult.value?.duration || 10) * fps.value,
   }
 }
 
+const rFrame = ref(0)
+
 async function seekToFrame(frame: number) {
-  console.log('seekToFrame', frame)
-  await fetch_data('seek')
-  currentTime.value = (frame / fps) * 1000
-  console.log('currentTime', currentTime.value)
+  rFrame.value = frame
+  await fetch_data()
+  currentTime.value = (frame / fps.value) * 1000
   await nextTick(updateLineHeights)
+
 
 }
 
@@ -219,8 +224,8 @@ function updateLineHeights() {
 }
 
 onMounted(async () => {
-  await nextTick(updateLineHeights)
-  window.addEventListener('resize', updateLineHeights)
+  // await nextTick(updateLineHeights)
+  // window.addEventListener('resize', updateLineHeights)
 })
 
 
@@ -232,16 +237,59 @@ const offsetY = computed(() => {
   return centerOffset - (sumPrev + currentHeight / 2)
 })
 
-const centerOffset = 540 // mitad de 1080p
+const offsetYAnimated = computed(() => {
+  const idx = currentIndex.value
+  if (idx < 0) return offsetY.value
+
+  // Tiempo de inicio y fin de la animación
+  if (!lines.value) return offsetY.value
+  const nextLine = lines.value[idx + 1]
+  if (!nextLine) return offsetY.value
+
+  const animStart = nextLine.timeInMs - 200 // 0.2s antes
+  const animEnd = nextLine.timeInMs + 200   // 0.2s después
+  const tNow = currentTime.value
+
+  // Si estamos fuera del rango, usar posición fija
+  if (tNow <= animStart) return offsetY.value
+  if (tNow >= animEnd) {
+    // Ya pasamos a la siguiente línea, usar offset de la nueva
+    const idxNext = idx + 1
+    const prevHeights = lineHeights.value.slice(0, idxNext)
+    const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
+    const currentHeight = lineHeights.value[idxNext] || 0
+    return centerOffset - (sumPrev + currentHeight / 2)
+  }
+
+  // Normalizar el progreso entre 0 y 1
+  const progress = (tNow - animStart) / (animEnd - animStart)
+
+  // Easing cuadrático: suave → rápido → suave
+  const ease = progress < 0.5
+    ? 2 * progress * progress
+    : -1 + (4 - 2 * progress) * progress
+
+  // Calcular offset inicial y final
+  const startOffset = offsetY.value
+  const idxNext = idx + 1
+  const prevHeightsNext = lineHeights.value.slice(0, idxNext)
+  const sumPrevNext = prevHeightsNext.reduce((a, b) => a + b, 0)
+  const nextOffset = centerOffset - (sumPrevNext + (lineHeights.value[idxNext] || 0) / 2)
+
+  // Interpolar suavemente
+  return startOffset + (nextOffset - startOffset) * ease
+})
+
+const heightStore = useHeightStore();
+
+const centerOffset = heightStore.height / 2
 </script>
 
 <template>
   <div
     class="lyric-container row justify-center"
     :style="{
-        transform: `translateY(${offsetY}px)`,
-        transition: 'transform 0.4s ease-out'
-      }">
+        transform: `translateY(${offsetYAnimated}px)`}">
     <LoadingKaomoji v-if="fetching==='fetching'"/>
     <div v-else-if="!lines && !lyrics"
          class="text-lyrics description ytmusic-description-shelf-renderer"
@@ -253,6 +301,11 @@ const centerOffset = 540 // mitad de 1080p
     </div>
 
     <div v-else-if="lines">
+      <!--      <span style="font-size: 3rem; color: white; float: left">
+            {{ rFrame }} - {{ currentTime }}
+            </span>-->
+      <span style="font-size: 3rem; color: white; float: left">
+      </span>
       <SyncedLine
         v-for="(l, i) in lines" :key="i"
         :line="l"

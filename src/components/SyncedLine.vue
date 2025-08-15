@@ -11,6 +11,7 @@ import {
   simplifyUnicode
 } from "src/plugins/synced-lyrics/renderer/utils";
 import {useRoute} from "vue-router";
+import {useHeightStore} from "stores/height";
 
 const route = useRoute();
 
@@ -60,8 +61,12 @@ const setRomanjiRef = (el: unknown, index: number) => {
 
 //todo: dinamic rem by resolution
 //small: 2rem
-const baseFont = 4; // 1080->3 1440->4 2160->5
-const maxFont = 5;  // 1080->4 1440->5 2160->6
+const heightStore = useHeightStore();
+
+const baseFont = heightStore.baseFont;
+const maxFont = heightStore.maxFont;  // 1080->4 1440->5 2160->6
+
+
 const wordDelay = 100; // ms entre inicios de palabras
 const growTime = 100; // ms que tarda en llegar al max
 
@@ -84,14 +89,13 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
 
   if (!el) return;
   if (small === 'small') {
-    el.style.fontSize = `${baseFont - 1}rem`;
+    el.style.fontSize = `${heightStore.smallFont}rem`;
     return;
   }
   if (status.value !== 'current') {
     el.style.fontSize = `${baseFont}rem`;
     return;
   }
-  console.log('word', el.textContent)
 
   const startTime = props.line.timeInMs + index * wordDelay;
   const endTime = startTime + growTime;
@@ -108,9 +112,51 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
       fontSize = maxFont;
     }
   }
-  console.log('fontSize', fontSize)
   el.style.fontSize = `${fontSize}rem`;
 }
+
+const bigbangWords = [
+  'BIG',
+  'BANG',
+  'BIGBANG',
+  '(BANG',
+  'BANG)',
+]
+
+const bigbangLetters = [
+  'B',
+  'B.',
+  'I',
+  'I.',
+  'G',
+  'G.',
+]
+const bigbangLines = [
+  'B TO THE I TO THE G (BANG BANG)'
+]
+
+onMounted(() => {
+  const bigbang = true
+  if (bigbang) {
+    wordRefs.value.forEach((el) => {
+      if (!el) return;
+      const wordUp = (el.textContent ?? '').trim().toUpperCase();
+
+      if (bigbangWords.includes(wordUp)) {
+        el.style.fontFamily = 'Earth,sans-serif';
+        el.textContent = (el.textContent ?? '').toUpperCase();
+        return;
+      }
+      if (bigbangLines.includes(props.line.text.trim().toUpperCase())){
+        if (bigbangLetters.includes(wordUp)) {
+          el.style.fontFamily = 'Earth,sans-serif';
+          el.textContent = (el.textContent ?? '').toUpperCase();
+          return;
+        }
+      }
+    });
+  }
+})
 
 
 const text = computed(() => {
@@ -148,7 +194,6 @@ onMounted(async () => {
     small.value = 'small'
   }
 })
-
 
 
 function goToTime() {
@@ -225,6 +270,7 @@ function goToTime() {
 
 .upcoming, .previous, .current {
   font-family: Verdana, sans-serif;
+  //font-family: ;
   color: white;
   paint-order: stroke fill;
 
