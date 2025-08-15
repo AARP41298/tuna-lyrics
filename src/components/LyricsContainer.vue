@@ -194,10 +194,13 @@ async function getInfo() {
 
 const rFrame = ref(0)
 
+const emits = defineEmits(['update-time'])
+
 async function seekToFrame(frame: number) {
   rFrame.value = frame
   await fetch_data()
   currentTime.value = (frame / fps.value) * 1000
+  emits('update-time', currentTime.value)
   await nextTick(updateLineHeights)
 
 
@@ -304,8 +307,7 @@ const centerOffset = heightStore.height / 2
       <!--      <span style="font-size: 3rem; color: white; float: left">
             {{ rFrame }} - {{ currentTime }}
             </span>-->
-      <span style="font-size: 3rem; color: white; float: left">
-      </span>
+
       <SyncedLine
         v-for="(l, i) in lines" :key="i"
         :line="l"

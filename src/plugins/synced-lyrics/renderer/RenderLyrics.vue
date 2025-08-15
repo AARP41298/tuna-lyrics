@@ -3,7 +3,7 @@
 
 import LyricsContainer from "components/LyricsContainer.vue";
 
-import {onMounted} from "vue";
+import {computed, onMounted} from "vue";
 
 const config = () => ({
   enabled: true,
@@ -108,14 +108,50 @@ onMounted(() => {
   }
 });
 
+import {ref} from "vue";
+import {useHeightStore} from "stores/height";
+
+const time = ref(0)
+
+function reciveTime(currentTime: number) {
+  time.value = currentTime
+}
+
+const opacity = computed(() => {
+  if (time.value < 5000) return 1;
+
+  const abs = Math.abs(5000 - time.value);
+  const maxDiff = 5000;
+  const clamped = Math.min(abs, maxDiff);
+
+  const t = 1 - clamped / maxDiff;
+
+  const logNorm = Math.log1p(t * 9) / Math.log1p(9);
+
+  //todo: just debug, return to 0
+  return Math.max(logNorm, 0);
+});
+
+const marcaFont = ref(2)
+const heightStore = useHeightStore();
+marcaFont.value = heightStore.baseFont
+
 </script>
 
 <template>
   <div class="lyrics-renderer"
-  style="overflow: hidden;
+       style="overflow: hidden;
   margin: 0;
   padding: 0;">
-    <LyricsContainer/>
+     <span :style="{
+       'font-size': marcaFont + 'rem',
+        color: 'white',
+         position: 'absolute',
+         opacity: opacity,
+         }">
+      By <span style="font-family: Earth,sans-serif">AARP</span> music
+    </span>
+    <LyricsContainer @update-time="reciveTime"/>
   </div>
 </template>
 
