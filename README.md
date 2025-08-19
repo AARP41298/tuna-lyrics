@@ -52,7 +52,7 @@ node render --url="http://localhost:9000/#/?json=cuando_te_vas&smallKanji=true&f
 node render --url="http://localhost:9000/#/?lrclibid=3362532&width=3840&height=2160&smallKanji=true&fps=60" --video=exports/girlfriend.mov --alpha --parallelism=15
 ```
 #### Final videos.
-https://www.youtube.com/@aarpmusic/videos
+https://www.youtube.com/playlist?list=PLhuzr6DPRZXnk2Rxci9Apl-iPnH006aO0
 
 # DEV
 ## Install the dependencies
