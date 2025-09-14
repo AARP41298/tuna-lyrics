@@ -135,8 +135,15 @@ const bigbangLines = [
   'B TO THE I TO THE G (BANG BANG)'
 ]
 
+const pokeWords = [
+  'pokémon',
+  '(pokémon)',
+  'pokémon,',
+]
+
 onMounted(() => {
   const bigbang = true
+  const pokemon = true
   if (bigbang) {
     wordRefs.value.forEach((el) => {
       if (!el) return;
@@ -147,12 +154,24 @@ onMounted(() => {
         el.textContent = (el.textContent ?? '').toUpperCase();
         return;
       }
-      if (bigbangLines.includes(props.line.text.trim().toUpperCase())){
+      if (bigbangLines.includes(props.line.text.trim().toUpperCase())) {
         if (bigbangLetters.includes(wordUp)) {
           el.style.fontFamily = 'Earth,sans-serif';
           el.textContent = (el.textContent ?? '').toUpperCase();
           return;
         }
+      }
+    });
+  }
+  if (pokemon) {
+    wordRefs.value.forEach((el) => {
+      if (!el) return;
+      const wordUp = (el.textContent ?? '').trim().toLowerCase();
+
+      if (pokeWords.includes(wordUp)) {
+        el.classList.add('texto-pokemon')
+        el.textContent = (el.textContent ?? '');
+        return;
       }
     });
   }
@@ -296,6 +315,13 @@ function goToTime() {
 .texto-con-borde-grueso {
   color: white;
   @include text-outline(3, black); /* 3px de grosor */
+}
+
+.texto-pokemon {
+  color: #ffcb02;
+  font-family: pokemonFont, serif;
+  @include text-outline(3, #0065b0); /* 3px de grosor */
+  letter-spacing: 10px;
 }
 
 </style>
