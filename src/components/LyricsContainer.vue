@@ -52,74 +52,81 @@ watch(searchResult, (newRes) => {
 
 async function fetch_data() {
 
-  //todo: disable YT
-  await fetch(YT_API)
-    .then(response => response.json())
-    .then(async data => {
-      // data now contains the json object with song metadata
+  const lrclibID = Array.isArray(route.query.lrclibid)
+    ? route.query.lrclibid[0] ?? ''
+    : route.query.lrclibid ?? ''
 
-      const debugTime = Array.isArray(route.query.debugTime)
-        ? route.query.debugTime[0] ?? ''
-        : route.query.debugTime ?? ''
-      if (debugTime) {
-        currentTime.value = parseInt(debugTime) * 1000
-      }
+  console.log(lrclibID)
 
-      if (data['title'] != title.value) {
-        title.value = data['title'];
-        alternativeTitle.value = data['alternativeTitle'];
-        //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
-        // src/plugins/tuna-obs/index.ts:89
-        artistsYT.value = data['artists'];
-        album.value = data['album'];
-        // why in mili? ""  ""      ""                  ""
+  const jsonName = Array.isArray(route.query.json)
+    ? route.query.json[0] ?? ''
+    : route.query.json ?? ''
+  console.log(jsonName)
 
-        durationMs.value = data['songDuration'] * 1000;
-        duration.value = data['songDuration'];
-        status.value = data['status'];
-        isPaused.value = data['isPaused'];
-        tags.value = data['tags'];
-
-        fetching.value = 'fetching';
-
-        //en vez de buscar, el ID de la cancion
-        // https://lrclib.net/api/get/3396226
-
-        const lrclibID = Array.isArray(route.query.lrclibid)
-          ? route.query.lrclibid[0] ?? ''
-          : route.query.lrclibid ?? ''
-
-        const jsonName = Array.isArray(route.query.json)
-          ? route.query.json[0] ?? ''
-          : route.query.json ?? ''
-
-        if (lrclibID || jsonName) {
-          let idData;
-          if (lrclibID) {
-            idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
-          }
-          if (jsonName) {
-            idData = await (await fetch(`/lrc/${jsonName}.json`)).json();
-          }
+  if (lrclibID || jsonName) {
+    let idData;
+    if (lrclibID) {
+      idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
+    }
+    if (jsonName) {
+      idData = await (await fetch(`/lrc/${jsonName}.json`)).json();
+    }
 
 
-          //from LRCLib.ts
-          const raw = idData.syncedLyrics;
-          const plain = idData.plainLyrics;
+    //from LRCLib.ts
+    const raw = idData.syncedLyrics;
+    const plain = idData.plainLyrics;
 
-          searchResult.value = {
-            title: idData.trackName,
-            artists: idData.artistName.split(/[&,]/g),
-            lines: raw
-              ? LRC.parse(raw).lines.map((l) => ({
-                ...l,
-                status: 'upcoming' as const,
-              }))
-              : undefined,
-            lyrics: plain,
-            duration: idData.duration,
-          }
-        } else {
+    searchResult.value = {
+      title: idData.trackName,
+      artists: idData.artistName.split(/[&,]/g),
+      lines: raw
+        ? LRC.parse(raw).lines.map((l) => ({
+          ...l,
+          status: 'upcoming' as const,
+        }))
+        : undefined,
+      lyrics: plain,
+      duration: idData.duration,
+    }
+
+  } else {
+
+
+    //todo: disable YT
+    await fetch(YT_API)
+      .then(response => response.json())
+      .then(async data => {
+        // data now contains the json object with song metadata
+
+        const debugTime = Array.isArray(route.query.debugTime)
+          ? route.query.debugTime[0] ?? ''
+          : route.query.debugTime ?? ''
+        if (debugTime) {
+          currentTime.value = parseInt(debugTime) * 1000
+        }
+
+        if (data['title'] != title.value) {
+          title.value = data['title'];
+          alternativeTitle.value = data['alternativeTitle'];
+          //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
+          // src/plugins/tuna-obs/index.ts:89
+          artistsYT.value = data['artists'];
+          album.value = data['album'];
+          // why in mili? ""  ""      ""                  ""
+
+          durationMs.value = data['songDuration'] * 1000;
+          duration.value = data['songDuration'];
+          status.value = data['status'];
+          isPaused.value = data['isPaused'];
+          tags.value = data['tags'];
+
+          fetching.value = 'fetching';
+
+          //en vez de buscar, el ID de la cancion
+          // https://lrclib.net/api/get/3396226
+
+
           searchResult.value = await LRCLibClass.search({
             title: data['title'],
             alternativeTitle: data['alternativeTitle'],
@@ -129,23 +136,27 @@ async function fetch_data() {
             tags: data['tags'],
             videoId: ''
           });
-        }
-        fetching.value = 'done'
-        if (searchResult.value) {
-          lines.value = searchResult.value.lines
-          lyrics.value = searchResult.value.lyrics!
-        } else {
-          lines.value = []
-          lyrics.value = undefined
-        }
 
-      }
-      return 'return'
-    })
-    .catch(function (error) {
-      console.error(error);
-      // Do nothing
-    });
+          fetching.value = 'done'
+
+
+        }
+        return 'return'
+      })
+      .catch(function (error) {
+        console.error(error);
+        // Do nothing
+      });
+  }
+
+
+  if (searchResult.value) {
+    lines.value = searchResult.value.lines
+    lyrics.value = searchResult.value.lyrics!
+  } else {
+    lines.value = []
+    lyrics.value = undefined
+  }
 
 }
 
