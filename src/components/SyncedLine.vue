@@ -254,7 +254,7 @@ function goToTime() {
 .texto-pokemon {
   color: #ffcb02;
   font-family: pokemonFont, serif;
-  @include text-outline(3, #0065b0); /* 3px de grosor */
+  @include text-outline(5, #0065b0); /* 3px de grosor */
   letter-spacing: 10px;
 }
 
