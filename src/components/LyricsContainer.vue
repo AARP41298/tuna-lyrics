@@ -63,7 +63,11 @@ async function fetch_data() {
     : route.query.json ?? ''
   console.log(jsonName)
 
-  if (lrclibID || jsonName) {
+  const lrcName = Array.isArray(route.query.lrc)
+    ? route.query.lrc[0] ?? ''
+    : route.query.lrc ?? ''
+
+  if (lrclibID || jsonName || lrcName) {
     let idData;
     if (lrclibID) {
       idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
@@ -71,7 +75,20 @@ async function fetch_data() {
     if (jsonName) {
       idData = await (await fetch(`/lrc/${jsonName}.json`)).json();
     }
+    if (lrcName) {
+      const response = await fetch(`/lrc/${lrcName}.lrc`);
+      const text = await response.text();
+      const lines = text
+        .split(/\r?\n/)
+        .map(line => line.trim())
 
+      idData = {
+        syncedLyrics:lines.join("\n"),
+        plainLyrics: "",
+        trackName: "",
+        artistName: "",
+      }
+    }
 
     //from LRCLib.ts
     const raw = idData.syncedLyrics;
@@ -93,7 +110,6 @@ async function fetch_data() {
   } else {
 
 
-    //todo: disable YT
     await fetch(YT_API)
       .then(response => response.json())
       .then(async data => {
