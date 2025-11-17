@@ -4,10 +4,7 @@ import {computed, onMounted, ref, watch} from 'vue'
 import type {LineLyrics} from "src/plugins/synced-lyrics/types";
 import {
   canonicalize,
-  romanizeChinese,
-  romanizeHangul,
-  romanizeJapanese,
-  romanizeJapaneseOrHangul,
+  romanize,
   simplifyUnicode
 } from "src/plugins/synced-lyrics/renderer/utils";
 import {useRoute} from "vue-router";
@@ -18,8 +15,6 @@ const route = useRoute();
 
 const props = defineProps<{
   line: LineLyrics;
-  hasJapanese: boolean;
-  hasKorean: boolean;
   current: number;
   durationMs: number;
 }>()
@@ -199,14 +194,10 @@ onMounted(async () => {
 
   const input = canonicalize(text.value);
 
-  let result: string;
-  if (props.hasJapanese) {
-    if (props.hasKorean) result = await romanizeJapaneseOrHangul(input);
-    else result = await romanizeJapanese(input);
-  } else if (props.hasKorean) result = romanizeHangul(input);
-  else result = romanizeChinese(input);
+  await romanize(input).then((result) => {
+    romanization.value=canonicalize(result);
+  });
 
-  romanization.value = canonicalize(result);
 
   showRomanji.value = simplifyUnicode(text.value) !== simplifyUnicode(romanization.value)
   if (smallKanji && showRomanji.value) {

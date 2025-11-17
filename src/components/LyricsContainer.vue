@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {hasJapaneseInString, hasKoreanInString} from "src/plugins/synced-lyrics/renderer/utils";
+import {computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 
 
 import LoadingKaomoji from "components/LoadingKaomoji.vue";
@@ -12,8 +11,6 @@ import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
 import {useHeightStore} from "stores/height";
 
-const hasJapanese = ref(false);
-const hasKorean = ref(false);
 const currentTime = ref(0);
 // const FETCH_URL = 'http://localhost:1608/';
 const YT_API = 'http://localhost:26538/api/v1/song';
@@ -39,16 +36,6 @@ const LRCLibClass = new LRCLib();
 const route = useRoute();
 
 
-watch(searchResult, (newRes) => {
-  const data = newRes
-  if (data) {
-    hasKorean.value = hasKoreanInString(data)
-    hasJapanese.value = hasJapaneseInString(data)
-  } else {
-    hasKorean.value = false
-    hasJapanese.value = false
-  }
-})
 
 async function fetch_data() {
 
@@ -338,8 +325,6 @@ const centerOffset = heightStore.height / 2
       <SyncedLine
         v-for="(l, i) in lines" :key="i"
         :line="l"
-        :hasJapanese="hasJapanese"
-        :hasKorean="hasKorean"
         :current="currentTime"
         :durationMs="durationMs"
         :ref="(el)=>setLinesRef(el, i)"
