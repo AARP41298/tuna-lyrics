@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {onBeforeUnmount, ref, watch} from "vue";
-import {hasJapaneseInString, hasKoreanInString} from "src/plugins/synced-lyrics/renderer/utils";
+import {onBeforeUnmount, ref} from "vue";
 
 
 import LoadingKaomoji from "components/LoadingKaomoji.vue";
@@ -9,8 +8,6 @@ import SyncedLine from "components/SyncedLine.vue";
 import {LRCLib} from "src/plugins/synced-lyrics/providers/LRCLib";
 import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 
-const hasJapanese = ref(false);
-const hasKorean = ref(false);
 const currentTime = ref(0);
 // const FETCH_URL = 'http://localhost:1608/';
 const FETCH_URL = 'http://localhost:26538/api/v1/song';
@@ -35,16 +32,6 @@ const LRCLibClass = new LRCLib();
 const REFRESH_INTERVAL_MS = 1000;
 
 
-watch(searchResult, (newRes) => {
-  const data = newRes
-  if (data) {
-    hasKorean.value = hasKoreanInString(data)
-    hasJapanese.value = hasJapaneseInString(data)
-  } else {
-    hasKorean.value = false
-    hasJapanese.value = false
-  }
-})
 
 function fetch_data() {
   const startTime = performance.now();
@@ -142,8 +129,6 @@ onBeforeUnmount(() => {
       <SyncedLine
         v-for="(l, i) in lines" :key="i"
         :line="l"
-        :hasJapanese="hasJapanese"
-        :hasKorean="hasKorean"
         :current="currentTime"
         :durationMs="durationMs"
       />
