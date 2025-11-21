@@ -3,6 +3,8 @@
 
 import { defineConfig } from '#q-app/wrappers';
 import { fileURLToPath } from 'node:url';
+import { writeFileSync, existsSync, mkdirSync } from 'fs'
+import { join } from 'path'
 
 export default defineConfig((ctx) => {
   return {
@@ -38,6 +40,32 @@ export default defineConfig((ctx) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
+      afterBuild({quasarConf}){
+        const distDir = quasarConf.build?.distDir || 'dist'
+        const spaDir = join(distDir)
+
+        if (!existsSync(spaDir)) {
+          mkdirSync(spaDir, { recursive: true })
+        }
+
+        const bats=[
+          {filename: "Tuna Python Server.bat",
+            script: `@echo off
+py -m http.server
+pause`
+          },
+          {filename: "Node Server.bat",
+          script: `serve .`}
+        ]
+
+        for (const bat of bats){
+          const batPath = join(spaDir, bat.filename)
+          writeFileSync(batPath, bat.script, 'utf8')
+          console.log(`✅ Archivo creado: ${batPath}`)
+        }
+
+      },
+
       target: {
         browser: [ 'es2022', 'firefox115', 'chrome115', 'safari14' ],
         node: 'node20'
