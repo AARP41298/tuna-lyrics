@@ -148,6 +148,8 @@ marcaFont.value = heightStore.baseFont
         color: 'white',
          position: 'absolute',
          opacity: opacity,
+         top: '5%',
+         left: '5%',
          }">
       By <span style="font-family: Earth,sans-serif">AARP</span> music
     </span>
