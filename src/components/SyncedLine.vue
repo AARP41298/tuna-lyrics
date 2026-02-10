@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, nextTick, onMounted, ref, watch} from 'vue'
 
 import type {LineLyrics} from "src/plugins/synced-lyrics/types";
 import {
@@ -9,6 +9,7 @@ import {
 } from "src/plugins/synced-lyrics/renderer/utils";
 import {useRoute} from "vue-router";
 import {useHeightStore} from "stores/height";
+import {useRomanizedStore} from "stores/romanized";
 
 const route = useRoute();
 
@@ -69,15 +70,18 @@ const smallKanji = route.query.smallKanji ?? false
 
 watch(
   () => props.current,
-  (current) => {
+  async (current) => {
     wordRefs.value.forEach((el, index) => {
       popWord(el, index, current, small.value)
+
     });
 
     romanjiRefs.value.forEach((el, index) => {
       popWord(el, index, current)
     });
-  }
+    await nextTick()
+  },
+  // { immediate: true }
 );
 
 function popWord(el: HTMLElement | null, index: number, current: number, small: string = '') {
@@ -185,6 +189,7 @@ const text = computed(() => {
 
 const romanization = ref('')
 
+const romanizedStore = useRomanizedStore()
 
 const showRomanji = ref(false);
 const small = ref('')
@@ -194,15 +199,19 @@ onMounted(async () => {
 
   const input = canonicalize(text.value);
 
-  await romanize(input).then((result) => {
+  romanization.value = canonicalize(await romanize(input))
+  /*await romanize(input).then((result) => {
     romanization.value=canonicalize(result);
-  });
+  });*/
 
 
   showRomanji.value = simplifyUnicode(text.value) !== simplifyUnicode(romanization.value)
   if (smallKanji && showRomanji.value) {
     small.value = 'small'
   }
+  await nextTick()
+
+  romanizedStore.lineReady()
 })
 
 
@@ -287,7 +296,7 @@ function goToTime() {
 }
 
 .small {
-  font-size: 2rem;
+  //font-size: 2rem;
   //-webkit-text-stroke: .3rem black;
 }
 

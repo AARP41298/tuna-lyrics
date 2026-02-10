@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
 
 import LoadingKaomoji from "components/LoadingKaomoji.vue";
@@ -10,6 +10,7 @@ import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
 import {useHeightStore} from "stores/height";
+import { useRomanizedStore} from "stores/romanized";
 
 const currentTime = ref(0);
 // const FETCH_URL = 'http://localhost:1608/';
@@ -27,17 +28,21 @@ const isPaused = ref(false);
 const tags = ref<string[]>([]);
 const fetching = ref('');
 
-const lines = ref<LineLyrics[] | undefined>(undefined);
+const lines = ref<LineLyrics[] | undefined>([]);
 const lyrics = ref<string | undefined>('');
 const searchResult = ref<LyricResult | null>(null);
 
 const LRCLibClass = new LRCLib();
 
 const route = useRoute();
+let alreadyFetched = false;
 
 
 
 async function fetch_data() {
+  if (alreadyFetched){
+    return;
+  }
 
   const lrclibID = Array.isArray(route.query.lrclibid)
     ? route.query.lrclibid[0] ?? ''
@@ -160,8 +165,12 @@ async function fetch_data() {
     lines.value = []
     lyrics.value = undefined
   }
+  romanizedStore.reset(lines.value?.length || 0)
+  alreadyFetched = true
 
 }
+
+const romanizedStore = useRomanizedStore()
 
 // const requestInteral = setInterval(fetch_data, REFRESH_INTERVAL_MS);
 /*const localInterval = setInterval(() => {
@@ -181,7 +190,11 @@ declare global {
   }
 }
 
-onMounted(() => {
+/*function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}*/
+
+ onMounted( () => {
   window.getInfo = getInfo
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   window.seekToFrame = seekToFrame
@@ -198,11 +211,13 @@ onBeforeMount(() => {
 
 async function getInfo() {
   await fetch_data()
-
+  await seekToFrame(0)
+  // await sleep(2000)
+  await waitUntilAllReady()
 
   return {
     fps: fps.value,
-    numberOfFrames: (searchResult.value?.duration || 10) * fps.value,
+    numberOfFrames: Math.ceil((searchResult.value?.duration || 10)) * fps.value,
   }
 }
 
@@ -211,13 +226,33 @@ const rFrame = ref(0)
 const emits = defineEmits(['update-time'])
 
 async function seekToFrame(frame: number) {
+   // console.log("seekToFrame", frame)
   rFrame.value = frame
   await fetch_data()
   currentTime.value = (frame / fps.value) * 1000
   emits('update-time', currentTime.value)
   await nextTick(updateLineHeights)
+  await waitUntilAllReady()
+  await nextTick()
+  // await sleep(2000)
+  await nextTick()
+}
 
+function waitUntilAllReady(): Promise<void> {
+  const romanizedStore = useRomanizedStore()
+  return new Promise((resolve) => {
+    if (romanizedStore.completedRom) return resolve()
 
+    const stop = watch(
+      () => romanizedStore.completedRom,
+      (ready) => {
+        if (ready) {
+          stop()
+          resolve()
+        }
+      }
+    )
+  })
 }
 
 const currentIndex = computed(() => {
