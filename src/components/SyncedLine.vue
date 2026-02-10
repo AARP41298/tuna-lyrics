@@ -187,6 +187,10 @@ const text = computed(() => {
   return props.line.text;
 });
 
+
+let onlyFurigana = "";
+let onlyKanjis = "";
+
 const romanization = ref('')
 
 const romanizedStore = useRomanizedStore()
@@ -196,8 +200,10 @@ const small = ref('')
 onMounted(async () => {
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
+  onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
+  onlyFurigana = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$2');
 
-  const input = canonicalize(text.value);
+  const input = canonicalize(onlyFurigana);
 
   romanization.value = canonicalize(await romanize(input))
   /*await romanize(input).then((result) => {
@@ -245,7 +251,7 @@ function goToTime() {
           ref="durationDiv"
         >
         <span :class="'row justify-center'">
-          <span v-for="(word, index) in text.split(' ')" :key="index"
+          <span v-for="(word, index) in onlyKanjis.split(' ')" :key="index"
                 :ref="el=>setWordRef(el,index)"
           >
 <!--                      <yt-formatted-string>-->
