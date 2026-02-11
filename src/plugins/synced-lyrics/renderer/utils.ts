@@ -1,6 +1,6 @@
 // imported as script in index.html
-// import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
-// import Kuroshiro from 'kuroshiro';
+import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
+import Kuroshiro from 'kuroshiro';
 
 import {romanize as esHangulRomanize} from 'es-hangul';
 import hanja from 'hanja';

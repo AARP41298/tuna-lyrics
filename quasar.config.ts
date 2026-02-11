@@ -3,6 +3,7 @@
 
 import { defineConfig } from '#q-app/wrappers';
 import { fileURLToPath } from 'node:url';
+import {nodePolyfills} from "vite-plugin-node-polyfills";
 
 export default defineConfig((ctx) => {
   return {
@@ -89,7 +90,8 @@ export default defineConfig((ctx) => {
             lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
             useFlatConfig: true
           }
-        }, { server: false }]
+        }, { server: false }],
+        nodePolyfills(),
       ]
     },
 
