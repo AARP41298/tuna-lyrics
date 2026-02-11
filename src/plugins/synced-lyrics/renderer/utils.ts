@@ -10,15 +10,6 @@ import {lazy} from 'lazy-var';
 import { detect } from 'tinyld';
 
 
-export const selectors = {
-  head: '#tabsContent > .tab-header:nth-of-type(2)',
-  body: {
-    tabRenderer: '#tab-renderer[page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]',
-    root: 'ytmusic-description-shelf-renderer',
-  },
-};
-
-export const tabStates: Record<string, () => void> = {};
 
 export const canonicalize = (text: string) => {
   return (
