@@ -255,7 +255,23 @@ function goToTime() {
 .small {
   font-size: 2rem;
   -webkit-text-stroke: .3rem black;
+}
 
+@mixin text-outline($width: 2px, $color: black) {
+  $shadows: ();
+
+  @for $i from -$width through $width {
+    @for $j from -$width through $width {
+      $shadows: append($shadows, #{$i}px #{$j}px 0 $color, comma);
+    }
+  }
+
+  text-shadow: $shadows;
+}
+
+.texto-con-borde-grueso {
+  color: white;
+  @include text-outline(3, black); /* 3px de grosor */
 }
 
 .texto-pokemon {
