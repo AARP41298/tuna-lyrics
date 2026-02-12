@@ -314,6 +314,7 @@ function goToTime() {
       $shadows: append($shadows, #{$i}px #{$j}px 0 $color, comma);
     }
   }
+  $shadows: append($shadows, .5rem .5rem .5rem black, comma);
 
   text-shadow: $shadows;
 }
