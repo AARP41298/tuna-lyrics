@@ -196,7 +196,7 @@ function goToTime() {
          -->
         <!--         TODO: Investigate the animation, even though the duration is properly set, all lines have the same animation duration-->
         <div
-          class="text-lyrics"
+          class="text-lyrics texto-con-borde-grueso"
           ref="durationDiv"
         >
         <span :class="'row justify-center ' +small">
@@ -211,7 +211,7 @@ function goToTime() {
         </span>
 
           <!--        TODO: config()?.romanization-->
-          <span class="romaji row justify-center"
+          <span class="romaji row justify-center texto-con-borde-grueso"
                 v-if="showRomanji">
             <span v-for="(word, index) in romanization.split(' ')" :key="index"
                   :style="{ 'transition-delay': `${index * 0.05}s`,
@@ -235,13 +235,13 @@ function goToTime() {
 .current {
   font-weight: bold;
   font-size: 4rem;
-  -webkit-text-stroke: .5rem black;
+  //-webkit-text-stroke: .5rem black;
 }
 
 .upcoming, .previous {
   font-weight: normal;
   font-size: 3rem;
-  -webkit-text-stroke: .2rem black;
+  //-webkit-text-stroke: .2rem black;
 }
 
 .upcoming, .previous, .current {
@@ -254,7 +254,7 @@ function goToTime() {
 
 .small {
   font-size: 2rem;
-  -webkit-text-stroke: .3rem black;
+  //-webkit-text-stroke: .3rem black;
 }
 
 @mixin text-outline($width: 2px, $color: black) {
@@ -265,6 +265,7 @@ function goToTime() {
       $shadows: append($shadows, #{$i}px #{$j}px 0 $color, comma);
     }
   }
+  $shadows: append($shadows, .5rem .5rem .5rem black, comma);
 
   text-shadow: $shadows;
 }
