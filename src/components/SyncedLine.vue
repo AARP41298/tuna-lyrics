@@ -42,6 +42,11 @@ const opacity = computed(() => {
   return Math.max(logNorm, 0.05);
 });
 
+const wordRefs = ref<(HTMLElement | null)[]>([])
+const setWordRef = (el: unknown, index: number) => {
+  wordRefs.value[index] = el as HTMLElement
+}
+
 const refLine = ref<HTMLDivElement | undefined>(undefined);
 watch(status, () => {
   if (status.value === 'current') {
@@ -49,6 +54,49 @@ watch(status, () => {
       behavior: "smooth",
       block: "center"
     })
+  }
+})
+
+const bigbangWords = [
+  'BIG',
+  'BANG',
+  'BIGBANG',
+  '(BANG',
+  'BANG)',
+]
+
+const bigbangLetters = [
+  'B',
+  'B.',
+  'I',
+  'I.',
+  'G',
+  'G.',
+]
+const bigbangLines = [
+  'B TO THE I TO THE G (BANG BANG)'
+]
+
+onMounted(() => {
+  const bigbang = true
+  if (bigbang) {
+    wordRefs.value.forEach((el) => {
+      if (!el) return;
+      const wordUp = (el.textContent ?? '').trim().toUpperCase();
+
+      if (bigbangWords.includes(wordUp)) {
+        el.style.fontFamily = 'Earth,sans-serif';
+        el.textContent = (el.textContent ?? '').toUpperCase();
+        return;
+      }
+      if (bigbangLines.includes(props.line.text.trim().toUpperCase())){
+        if (bigbangLetters.includes(wordUp)) {
+          el.style.fontFamily = 'Earth,sans-serif';
+          el.textContent = (el.textContent ?? '').toUpperCase();
+          return;
+        }
+      }
+    });
   }
 })
 
@@ -127,6 +175,7 @@ function goToTime() {
         >
         <span :class="'row justify-center ' +small">
           <span v-for="(word, index) in text.split(' ')" :key="index"
+                :ref="el=>setWordRef(el,index)"
                 :style="{ 'transition-delay': `${index * 0.05}s`,
                       'animation-delay': `${index * 0.05}s`,}">
 <!--                      <yt-formatted-string>-->
