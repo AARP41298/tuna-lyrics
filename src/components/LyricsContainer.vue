@@ -10,7 +10,9 @@ import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 
 const currentTime = ref(0);
 // const FETCH_URL = 'http://localhost:1608/';
-const FETCH_URL = 'http://localhost:26538/api/v1/song';
+const protocol = window.location.protocol === 'https:' ? 'https' : 'http'
+const host = window.location.hostname
+const FETCH_URL = `${protocol}://${host}:26538/api/v1/song`
 
 
 const title = ref('');
