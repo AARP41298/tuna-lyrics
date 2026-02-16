@@ -283,6 +283,8 @@ function goToTime() {
     $y: calc(#{math.sin($angle)} * #{$offset});
     $shadows: list.append($shadows, #{$x} #{$y} 0 #{$color}, $separator: comma);
   }
+  $shadows: append($shadows, .5rem .5rem .5rem black, comma);
+
   text-shadow: $shadows;
 }
 
