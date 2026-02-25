@@ -358,7 +358,7 @@ function goToTime() {
   //paint-order: stroke fill;
 
 
-  @include math-text-outline( $offset: calc(0.05rem + 0.05em),
+  @include math-text-outline($offset: calc(0.2rem + 0.2em),
   $color: black,
   $num-steps: 32);
 
