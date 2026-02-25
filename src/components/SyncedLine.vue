@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, ref, watch} from 'vue'
+import {computed, onBeforeMount, onMounted, ref, watch} from 'vue'
 
 import type {LineLyrics} from "src/plugins/synced-lyrics/types";
 import {
@@ -67,21 +67,34 @@ const wordDelay = 100; // ms entre inicios de palabras
 const growTime = 100; // ms que tarda en llegar al max
 
 const smallKanji = route.query.smallKanji ?? false
+const romanizedStore = useRomanizedStore()
 
 watch(
   () => props.current,
-  async (current) => {
-    wordRefs.value.forEach((el, index) => {
-      popWord(el, index, current, small.value)
+  (current) => {
+/*    console.log('plt',props.line.text)
+    let wordRefsText = ''
+    wordRefs.value.forEach((el) => {
+      wordRefsText += el ? el.textContent :''
+    });
+    console.log('wordRefsText',wordRefsText,wordRefs.value.length)*/
 
+
+    romanizedStore.extraPlus()
+    wordRefs.value.forEach((el, index) => {
+      romanizedStore.extraPlus()
+      popWord(el, index, current, small.value)
+      romanizedStore.extraReady()
     });
 
     romanjiRefs.value.forEach((el, index) => {
+      romanizedStore.extraPlus()
       popWord(el, index, current)
+      romanizedStore.extraReady()
     });
-    await nextTick()
+    romanizedStore.extraReady()
   },
-  // { immediate: true }
+  { immediate: true }
 );
 
 function popWord(el: HTMLElement | null, index: number, current: number, small: string = '') {
@@ -193,11 +206,10 @@ let onlyKanjis = "";
 
 const romanization = ref('')
 
-const romanizedStore = useRomanizedStore()
 
 const showRomanji = ref(false);
 const small = ref('')
-onMounted(async () => {
+onBeforeMount(async () => {
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
   onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
@@ -215,7 +227,6 @@ onMounted(async () => {
   if (smallKanji && showRomanji.value) {
     small.value = 'small'
   }
-  await nextTick()
 
   romanizedStore.lineReady()
 })

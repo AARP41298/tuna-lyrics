@@ -210,7 +210,9 @@ onBeforeMount(() => {
 })
 
 async function getInfo() {
+   romanizedStore.extraPlus()
   await fetch_data()
+  romanizedStore.extraReady()
   await seekToFrame(0)
   // await sleep(2000)
   await waitUntilAllReady()
@@ -225,8 +227,17 @@ const rFrame = ref(0)
 
 const emits = defineEmits(['update-time'])
 
+onMounted(async ()=>{
+  const seek = Array.isArray(route.query.seek)
+    ? route.query.seek[0] ?? null
+    : route.query.seek ?? null
+  if (seek) {
+    await seekToFrame(Number.parseInt(seek))
+  }
+})
+
 async function seekToFrame(frame: number) {
-   // console.log("seekToFrame", frame)
+
   rFrame.value = frame
   await fetch_data()
   currentTime.value = (frame / fps.value) * 1000
@@ -241,7 +252,7 @@ async function seekToFrame(frame: number) {
 function waitUntilAllReady(): Promise<void> {
   const romanizedStore = useRomanizedStore()
   return new Promise((resolve) => {
-    if (romanizedStore.completedRom) return resolve()
+    if (romanizedStore.completedRom&&romanizedStore.completedExtra) return resolve()
 
     const stop = watch(
       () => romanizedStore.completedRom,
@@ -274,11 +285,6 @@ const setLinesRef = (el: unknown, index: number) => {
 function updateLineHeights() {
   lineHeights.value = lineRefs.value.map(lRef => lRef?.$el.offsetHeight || 0)
 }
-
-onMounted(async () => {
-  // await nextTick(updateLineHeights)
-  // window.addEventListener('resize', updateLineHeights)
-})
 
 
 const offsetY = computed(() => {

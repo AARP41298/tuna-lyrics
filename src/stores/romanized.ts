@@ -4,9 +4,12 @@ export const useRomanizedStore = defineStore('romanized', {
   state: () => ({
     total: 0,
     count: 0,
+    extra: 0,
+    extraCount: 0,
   }),
   getters: {
     completedRom: (state) => state.total > 0 && state.count >= state.total,
+    completedExtra: (state) => state.extra > 0 && state.extraCount >= state.extra,
 
   },
   actions: {
@@ -17,6 +20,14 @@ export const useRomanizedStore = defineStore('romanized', {
     lineReady() {
       this.count++
     },
+
+    extraPlus(){
+      this.extra++
+    },
+    extraReady(){
+      this.extraCount++
+
+    }
   }
 });
 
