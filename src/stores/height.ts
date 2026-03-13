@@ -3,9 +3,9 @@ import {defineStore} from 'pinia';
 export const useHeightStore = defineStore('height', {
   state: () => ({
     height: 1080,
-    smallFont: 2,
-    baseFont: 3,
-    maxFont: 4,
+    smallFont: 3,
+    baseFont: 4,
+    maxFont: 5,
   }),
 
   getters: {

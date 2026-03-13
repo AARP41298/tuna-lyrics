@@ -101,11 +101,11 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
 
   if (!el) return;
   if (small === 'small') {
-    el.style.fontSize = `${heightStore.smallFont}rem`;
+    el.style.fontSize = `${heightStore.smallFont}vh`;
     return;
   }
   if (status.value !== 'current') {
-    el.style.fontSize = `${baseFont}rem`;
+    el.style.fontSize = `${baseFont}vh`;
     return;
   }
 
@@ -124,7 +124,7 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
       fontSize = maxFont;
     }
   }
-  el.style.fontSize = `${fontSize}rem`;
+  el.style.fontSize = `${fontSize}vh`;
 }
 
 const bigbangWords = [
@@ -209,12 +209,11 @@ const romanization = ref('')
 
 const showRomanji = ref(false);
 const small = ref('')
-onBeforeMount(async () => {
+onBeforeMount( async () => {
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
   onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
   onlyFurigana = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$2');
-
   const input = canonicalize(onlyFurigana);
 
   romanization.value = canonicalize(await romanize(input))
@@ -328,7 +327,7 @@ function goToTime() {
       $shadows: append($shadows, #{$i}px #{$j}px 0 $color, comma);
     }
   }
-  $shadows: append($shadows, .5rem .5rem .5rem black, comma);
+  $shadows: append($shadows, .5vh .5vh .5vh black, comma);
 
   text-shadow: $shadows;
 }
@@ -343,7 +342,7 @@ function goToTime() {
     $y: calc(#{math.sin($angle)} * #{$offset});
     $shadows: list.append($shadows, #{$x} #{$y} 0 #{$color}, $separator: comma);
   }
-  $shadows: append($shadows, .5rem .5rem .5rem black, comma);
+  $shadows: append($shadows, 1.75vh 1.75vh 1.75vh black, comma);
 
   text-shadow: $shadows;
 }
@@ -358,7 +357,7 @@ function goToTime() {
   //paint-order: stroke fill;
 
 
-  @include math-text-outline($offset: calc(0.2rem + 0.2em),
+  @include math-text-outline($offset: calc(.8vh + 0.2em),
   $color: black,
   $num-steps: 32);
 
