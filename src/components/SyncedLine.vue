@@ -216,7 +216,22 @@ onBeforeMount( async () => {
   onlyFurigana = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$2');
   const input = canonicalize(onlyFurigana);
 
-  romanization.value = canonicalize(await romanize(input))
+
+  const parts = input.match(/[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+|[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+/gu) || []
+  const resultParts: string[] = await Promise.all(
+
+    parts.map( async (part): Promise<string> => {
+      // Si es japonés, romanízalo
+      if (/^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+$/u.test(part)) {
+        return  canonicalize(await romanize(part))
+      }
+      // Si no, déjalo igual (emojis, texto, símbolos…)
+      return part
+    })
+  )
+
+
+  romanization.value = resultParts.join('')
   /*await romanize(input).then((result) => {
     romanization.value=canonicalize(result);
   });*/
