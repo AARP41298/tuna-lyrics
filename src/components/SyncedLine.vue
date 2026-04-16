@@ -418,11 +418,17 @@ function goToTime() {
   //paint-order: stroke fill;
 
 
-  @include math-text-outline($offset: calc(.8vh + 0.2em),
+  @include math-text-outline($offset: calc(.5vh + 0.2em),
   $color: black,
   $num-steps: 32);
+}
 
+.texto-bordecito {
+  color: white;
 
+  @include math-text-outline($offset: calc(.05vh),
+  $color: black,
+  $num-steps: 32);
 }
 
 .texto-pokemon {
