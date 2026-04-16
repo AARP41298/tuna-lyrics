@@ -1,11 +1,15 @@
 import {defineStore} from 'pinia';
 
+const s = 3.5;
+const b = 4.5;
+const m = 5.5;
+
 export const useHeightStore = defineStore('height', {
   state: () => ({
     height: 1080,
-    smallFont: 3,
-    baseFont: 4,
-    maxFont: 5,
+    smallFont: s,
+    baseFont: b,
+    maxFont: m,
   }),
 
   getters: {
@@ -15,9 +19,9 @@ export const useHeightStore = defineStore('height', {
     setHeight(newHeight: number) {
       this.height = newHeight;
 
-      const smallProp = 2 / 1080;
-      const baseProp = 3 / 1080;
-      const maxProp = 4 / 1080;
+      const smallProp = s / 1080;
+      const baseProp = b / 1080;
+      const maxProp = m / 1080;
 
       this.smallFont = newHeight * smallProp;
       this.baseFont = newHeight * baseProp;
