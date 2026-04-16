@@ -102,13 +102,6 @@ const romanizedStore = useRomanizedStore()
 watch(
   () => props.current,
   (current) => {
-/*    console.log('plt',props.line.text)
-    let wordRefsText = ''
-    wordRefs.value.forEach((el) => {
-      wordRefsText += el ? el.textContent :''
-    });
-    console.log('wordRefsText',wordRefsText,wordRefs.value.length)*/
-
 
     romanizedStore.extraPlus()
     wordRefs.value.forEach((el, index) => {
@@ -124,7 +117,7 @@ watch(
     });
     romanizedStore.extraReady()
   },
-  { immediate: true }
+  {immediate: true}
 );
 
 function popWord(el: HTMLElement | null, index: number, current: number, small: string = '') {
@@ -239,7 +232,7 @@ const romanization = ref('')
 
 const showRomanji = ref(false);
 const small = ref('')
-onBeforeMount( async () => {
+onBeforeMount(async () => {
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
   onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
@@ -249,11 +242,10 @@ onBeforeMount( async () => {
 
   const parts = input.match(/[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+|[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+/gu) || []
   const resultParts: string[] = await Promise.all(
-
-    parts.map( async (part): Promise<string> => {
+    parts.map(async (part): Promise<string> => {
       // Si es japonés, romanízalo
       if (/^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]+$/u.test(part)) {
-        return  canonicalize(await romanize(part))
+        return canonicalize(await romanize(part))
       }
       // Si no, déjalo igual (emojis, texto, símbolos…)
       return part
