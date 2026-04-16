@@ -52,9 +52,11 @@ export const LRC = {
         continue;
       }
 
-      const {minutes, seconds, milliseconds, text} = lyric;
+      const {minutes, seconds, text} = lyric;
 
-      if (!minutes || !seconds || !milliseconds || !text) continue;
+      if (!minutes || !seconds || !lyric.milliseconds || !text) continue;
+
+      const milliseconds = lyric?.milliseconds.padEnd(3,"0")
 
       const timeInMs =
         parseInt(minutes) * 60 * 1000 +
