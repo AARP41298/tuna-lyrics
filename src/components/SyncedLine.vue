@@ -30,6 +30,35 @@ const status = computed(() => {
   return 'current';
 });
 
+const cuenta3 = computed(() => {
+  const remaining = props.line.timeInMs - props.current
+  if (remaining <= 0) {
+    return "3"
+  }
+  if (remaining <= 1000) {
+    return "2"
+  }
+  if (remaining <= 2000) {
+    return "1"
+  }
+  if (remaining <= 3000) {
+    return ""
+  }
+  return ""
+})
+
+const prog3 = computed(() => {
+  const window = 3000
+  const start = props.line.timeInMs - window
+  const end = props.line.timeInMs
+
+  if (props.current <= start) return 0
+  if (props.current >= end) return 100
+
+  const progress = (props.current - start) / window
+  return progress * 100
+})
+
 
 const opacity = computed(() => {
   if (status.value === 'current') return 1;
@@ -276,26 +305,37 @@ function goToTime() {
           class="text-lyrics texto-con-borde-grueso"
           ref="durationDiv"
         >
-        <span :class="'row justify-center'">
-          <span v-for="(word, index) in onlyKanjis.split(' ')" :key="index"
-                :ref="el=>setWordRef(el,index)"
-          >
-<!--                      <yt-formatted-string>-->
-                {{ word }}&ensp;
-            <!--                      </yt-formatted-string>-->
-          </span>
-        </span>
+
+          <div class="row justify-center items-center">
+            <!--              color="teal"-->
+            <q-circular-progress
+              show-value
+              instant-feedback
+              :font-size="(maxFont-1)+'vh'"
+              :value="prog3"
+              :size="(maxFont+1)+'vh'"
+              :thickness="0.2"
+              track-color="grey-3"
+              class="q-ma-md texto-bordecito"
+            >
+              {{ cuenta3 }}
+            </q-circular-progress>
+            <span v-for="(word, index) in onlyKanjis.split(' ')" :key="index"
+                  :ref="el=>setWordRef(el,index)">
+                    {{ word }}&ensp;
+            </span>
+          </div>
 
           <!--        TODO: config()?.romanization-->
-          <span class="romaji row justify-center texto-con-borde-grueso"
-                v-if="showRomanji">
+          <div class="romaji row justify-center texto-con-borde-grueso"
+               v-if="showRomanji">
             <span v-for="(word, index) in romanization.split(' ')" :key="index"
                   :ref="el=>setRomanjiRef(el,index)">
   <!--                      <yt-formatted-string>-->
                   {{ word }}&ensp;
               <!--                      </yt-formatted-string>-->
             </span>
-        </span>
+          </div>
 
         </div>
       </div>
@@ -309,6 +349,11 @@ function goToTime() {
 <style scoped lang="scss">
 @use "sass:math";
 @use 'sass:list';
+
+:deep(.q-circular-progress__circle) {
+  //todo: extract main color of album thumbnail, or in json
+  color: #cd355d;
+}
 
 .current {
   font-weight: bold;
