@@ -366,6 +366,7 @@ const centerOffset = heightStore.height / 2
       <SyncedLine
         v-for="(l, i) in lines" :key="i"
         :line="l"
+        :index="i"
         :current="currentTime"
         :durationMs="durationMs"
         :ref="(el)=>setLinesRef(el, i)"

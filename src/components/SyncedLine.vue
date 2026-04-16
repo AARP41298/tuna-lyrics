@@ -18,6 +18,7 @@ const props = defineProps<{
   line: LineLyrics;
   current: number;
   durationMs: number;
+  index: number;
 }>()
 
 const durationDiv = ref<HTMLDivElement | null>(null);
