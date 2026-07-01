@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia';
 
-const s = 3.5;
-const b = 4.5;
-const m = 5.5;
+const s = 3.8;
+const b = 5.8;
+const m = 6.8;
 
 export const useHeightStore = defineStore('height', {
   state: () => ({
