@@ -151,7 +151,8 @@ marcaFont.value = heightStore.baseFont
          top: '5%',
          left: '5%',
          }">
-      By <span style="font-family: Earth,sans-serif">AARP</span> music
+      By <span style="font-family: Earth,sans-serif">AARP</span> <span :style="{
+        'font-size':(marcaFont/2)+'rem'}">with ❤️ from <img :height="marcaFont*6" src="/icons/flag-mexico.png" alt="mexio emoji"> </span>
     </span>
     <LyricsContainer @update-time="reciveTime"/>
   </div>
