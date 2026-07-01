@@ -310,6 +310,18 @@ function goToTime() {
           <!--        TODO: config()?.romanization-->
           <div class="romaji row justify-center texto-con-borde-grueso"
                v-if="showRomanji">
+            <q-circular-progress
+              show-value
+              instant-feedback
+              :font-size="(maxFont-1)+'vh'"
+              :value="prog3"
+              :size="(maxFont+1)+'vh'"
+              :thickness="0.2"
+              track-color="grey-3"
+              class="q-ma-md texto-bordecito"
+            >
+              {{ cuenta3 }}
+            </q-circular-progress>
             <span v-for="(word, index) in romanization.split(' ')" :key="index"
                   :ref="el=>setRomanjiRef(el,index)">
   <!--                      <yt-formatted-string>-->
