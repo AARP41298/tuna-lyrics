@@ -42,11 +42,14 @@ function fetch_data() {
     .then(async data => {
       const endTime = performance.now();
       const lag = endTime - startTime;
-      const predictedTime = (data['elapsedSeconds'] * 1000) + lag;
+      const predictedTime = (data['elapsedMilliseconds'] ?? (data['elapsedSeconds'] * 1000)) + lag;
+      // console.log(data['elapsedMilliseconds'] ?? (data['elapsedSeconds'] * 1000))
+      isPaused.value = data['isPaused'];
+
       // data now contains the json object with song metadata
       const diffTime = currentTime.value - predictedTime
       if (Math.abs(diffTime) > 2000) {
-        currentTime.value = predictedTime + 600;
+        currentTime.value = predictedTime;
       }
 
       if (data['title'] != title.value) {
@@ -62,7 +65,6 @@ function fetch_data() {
         durationMs.value = data['songDuration'] * 1000;
         duration.value = data['songDuration'];
         status.value = data['status'];
-        isPaused.value = data['isPaused'];
         tags.value = data['tags'];
 
         fetching.value = 'fetching';
