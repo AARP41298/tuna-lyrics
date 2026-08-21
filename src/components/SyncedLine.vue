@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {computed, onBeforeMount, onMounted, ref, watch} from 'vue'
+import {computed, nextTick, onBeforeMount, onMounted, ref, watch} from 'vue'
 
 import type {LineLyrics} from "src/plugins/synced-lyrics/types";
 import {
   canonicalize,
+  needsRomanization,
   romanize,
   simplifyUnicode
 } from "src/plugins/synced-lyrics/renderer/utils";
@@ -23,6 +24,7 @@ const props = defineProps<{
   current: number;
   durationMs: number;
   index: number;
+  artists?: string[];
 }>()
 
 const durationDiv = ref<HTMLDivElement | null>(null);
@@ -154,25 +156,51 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
   el.style.fontSize = `${fontSize}vh`;
 }
 
-const bigbangWords = [
+const bigbangWordCores = new Set([
   'BIG',
   'BANG',
   'BIGBANG',
-  '(BANG',
-  'BANG)',
-]
+  'BIGZ',
+])
 
-const bigbangLetters = [
+const bigbangLetterCores = new Set([
   'B',
-  'B.',
   'I',
-  'I.',
   'G',
-  'G.',
-]
-const bigbangLines = [
-  'B TO THE I TO THE G (BANG BANG)'
-]
+])
+
+function normalizeArtistName(name: string): string {
+  return name.trim().toUpperCase().replace(/[\s._-]+/g, '')
+}
+
+function lyricLetters(word: string): string {
+  return word
+    .trim()
+    .toUpperCase()
+    .replace(/[‘’‛ʻʼ]/g, "'")
+    .replace(/[^A-Z]/g, '')
+}
+
+function isBigbangWord(word: string): boolean {
+  return bigbangWordCores.has(lyricLetters(word))
+}
+
+function isBigbangLetterLine(text: string): boolean {
+  const n = text
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+  return n.includes('B TO THE I TO THE G')
+}
+
+function isBigbangLetter(word: string): boolean {
+  return bigbangLetterCores.has(lyricLetters(word))
+}
+
+const isBigbang = computed(() =>
+  (props.artists ?? []).some((a) => normalizeArtistName(a) === 'BIGBANG'),
+)
 
 const pokeWords = [
   'pokémon',
@@ -180,40 +208,28 @@ const pokeWords = [
   'pokémon,',
 ]
 
-onMounted(() => {
-  const bigbang = true
-  const pokemon = true
-  if (bigbang) {
-    wordRefs.value.forEach((el) => {
-      if (!el) return;
-      const wordUp = (el.textContent ?? '').trim().toUpperCase();
+function applySpecialFonts(els: (HTMLElement | null)[]) {
+  els.forEach((el) => {
+    if (!el) return;
+    const word = el.textContent ?? '';
 
-      if (bigbangWords.includes(wordUp)) {
+    if (isBigbang.value) {
+      if (isBigbangWord(word) || (isBigbangLetterLine(props.line.text) && isBigbangLetter(word))) {
         el.style.fontFamily = 'Earth,sans-serif';
-        el.textContent = (el.textContent ?? '').toUpperCase();
+        el.textContent = word.toUpperCase();
         return;
       }
-      if (bigbangLines.includes(props.line.text.trim().toUpperCase())) {
-        if (bigbangLetters.includes(wordUp)) {
-          el.style.fontFamily = 'Earth,sans-serif';
-          el.textContent = (el.textContent ?? '').toUpperCase();
-          return;
-        }
-      }
-    });
-  }
-  if (pokemon) {
-    wordRefs.value.forEach((el) => {
-      if (!el) return;
-      const wordUp = (el.textContent ?? '').trim().toLowerCase();
+    }
 
-      if (pokeWords.includes(wordUp)) {
-        el.classList.add('texto-pokemon')
-        el.textContent = (el.textContent ?? '');
-        return;
-      }
-    });
-  }
+    const wordUp = word.trim().toLowerCase();
+    if (pokeWords.includes(wordUp)) {
+      el.classList.add('texto-pokemon')
+    }
+  });
+}
+
+onMounted(() => {
+  applySpecialFonts(wordRefs.value)
 })
 
 
@@ -243,20 +259,23 @@ onBeforeMount(async () => {
   onlyFurigana = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$2');
   const input = canonicalize(onlyFurigana);
 
+  if (needsRomanization(input)) {
+    romanization.value = canonicalize(await romanize(input))
+    showRomanji.value = simplifyUnicode(input) !== simplifyUnicode(romanization.value)
+  } else {
+    romanization.value = input
+    showRomanji.value = false
+  }
 
-  romanization.value = canonicalize(await romanize(input))
-
-  /*await romanize(input).then((result) => {
-    romanization.value=canonicalize(result);
-  });*/
-
-
-  showRomanji.value = simplifyUnicode(text.value) !== simplifyUnicode(romanization.value)
   if (smallKanji && showRomanji.value) {
     small.value = 'small'
   }
 
   romanizedStore.lineReady()
+
+  await nextTick()
+  applySpecialFonts(wordRefs.value)
+  applySpecialFonts(romanjiRefs.value)
 })
 
 

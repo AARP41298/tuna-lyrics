@@ -372,6 +372,7 @@ const centerOffset = heightStore.height / 2
         :index="i"
         :current="currentTime"
         :durationMs="durationMs"
+        :artists="searchResult?.artists ?? []"
         :ref="(el)=>setLinesRef(el, i)"
       />
     </div>

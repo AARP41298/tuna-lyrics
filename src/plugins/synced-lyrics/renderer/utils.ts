@@ -166,7 +166,17 @@ const handlers: Record<string, (line: string) => Promise<string> | string> = {
   th: romanizeThai,
 };
 
+export const needsRomanization = (line: string) =>
+  hasJapanese([line]) ||
+  hasKorean([line]) ||
+  hasChinese([line]) ||
+  hasThai([line]);
+
 export const romanize = async (line: string) => {
+  if (!needsRomanization(line)) {
+    return line;
+  }
+
   const lang = detect(line);
 
   const handler = handlers[lang];
