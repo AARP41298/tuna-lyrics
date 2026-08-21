@@ -7,6 +7,10 @@ import {
   romanize,
   simplifyUnicode
 } from "src/plugins/synced-lyrics/renderer/utils";
+import {
+  DEFAULT_PROGRESS_COLOR,
+  DEFAULT_PROGRESS_TRACK_COLOR,
+} from "src/plugins/synced-lyrics/emojiColors";
 import {useRoute} from "vue-router";
 import {useHeightStore} from "stores/height";
 import {useRomanizedStore} from "stores/romanized";
@@ -262,6 +266,17 @@ function goToTime() {
 
 }
 
+const progressColor = computed(
+  () => props.line.progressColor ?? DEFAULT_PROGRESS_COLOR,
+);
+const progressTrackColor = computed(
+  () => props.line.progressTrackColor ?? DEFAULT_PROGRESS_TRACK_COLOR,
+);
+const progressStyle = computed(() => ({
+  '--progress-color': progressColor.value,
+  '--progress-track-color': progressTrackColor.value,
+}));
+
 </script>
 
 <template>
@@ -297,7 +312,8 @@ function goToTime() {
               :size="(maxFont+1)+'vh'"
               :thickness="0.2"
               track-color="grey-3"
-              class="q-ma-md texto-bordecito"
+              :style="progressStyle"
+              class="q-ma-md texto-bordecito emoji-progress"
             >
               {{ cuenta3 }}
             </q-circular-progress>
@@ -318,7 +334,8 @@ function goToTime() {
               :size="(maxFont+1)+'vh'"
               :thickness="0.2"
               track-color="grey-3"
-              class="q-ma-md texto-bordecito"
+              :style="progressStyle"
+              class="q-ma-md texto-bordecito emoji-progress"
             >
               {{ cuenta3 }}
             </q-circular-progress>
@@ -343,9 +360,12 @@ function goToTime() {
 @use "sass:math";
 @use 'sass:list';
 
-:deep(.q-circular-progress__circle) {
-  //todo: extract main color of album thumbnail, or in json
-  color: #cd355d;
+:deep(.emoji-progress .q-circular-progress__circle) {
+  color: var(--progress-color, #2c00cc);
+}
+
+:deep(.emoji-progress .q-circular-progress__track) {
+  stroke: var(--progress-track-color, #e0e0e0);
 }
 
 .current {

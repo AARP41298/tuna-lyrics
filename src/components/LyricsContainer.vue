@@ -9,6 +9,7 @@ import {LRCLib} from "src/plugins/synced-lyrics/providers/LRCLib";
 import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
+import {applyEmojiProgressColors} from "src/plugins/synced-lyrics/emojiColors";
 import {useHeightStore} from "stores/height";
 import { useRomanizedStore} from "stores/romanized";
 
@@ -90,10 +91,12 @@ async function fetch_data() {
       title: idData.trackName,
       artists: idData.artistName.split(/[&,]/g),
       lines: raw
-        ? LRC.parse(raw).lines.map((l) => ({
-          ...l,
-          status: 'upcoming' as const,
-        }))
+        ? applyEmojiProgressColors(
+          LRC.parse(raw).lines.map((l) => ({
+            ...l,
+            status: 'upcoming' as const,
+          })),
+        )
         : undefined,
       lyrics: plain,
       duration: idData.duration,

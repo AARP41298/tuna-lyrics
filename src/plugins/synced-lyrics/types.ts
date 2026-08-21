@@ -19,6 +19,11 @@ export type LineLyrics = {
 
   text: string;
   status: LineLyricsStatus;
+
+  /** Circular-progress arc color derived from section emojis */
+  progressColor?: string;
+  /** Circular-progress track color (optional contrast override) */
+  progressTrackColor?: string;
 };
 
 export type LineEffect = 'fancy' | 'scale' | 'offset' | 'focus';

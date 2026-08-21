@@ -1,6 +1,7 @@
 import {jaroWinkler} from '@skyra/jaro-winkler';
 
 import {LRC} from '../parsers/lrc';
+import {applyEmojiProgressColors} from '../emojiColors';
 
 import type {LyricProvider, LyricResult, SearchSongInfo} from '../types';
 
@@ -171,10 +172,12 @@ export class LRCLib implements LyricProvider {
         title: closestResult.trackName,
         artists: closestResult.artistName.split(/[&,]/g),
         lines: raw
-          ? LRC.parse(raw).lines.map((l) => ({
-            ...l,
-            status: 'upcoming' as const,
-          }))
+          ? applyEmojiProgressColors(
+            LRC.parse(raw).lines.map((l) => ({
+              ...l,
+              status: 'upcoming' as const,
+            })),
+          )
           : undefined,
         lyrics: plain,
         duration: closestResult.duration,
