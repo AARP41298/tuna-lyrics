@@ -11,6 +11,10 @@ export const DEFAULT_PROGRESS_COLOR = '#2c00cc';
 /** Default track when no override is set (Quasar grey-3-ish) */
 export const DEFAULT_PROGRESS_TRACK_COLOR = '#e0e0e0';
 
+/** Progress color for lines that are only a parenthetical annotation */
+export const ANNOTATION_PROGRESS_COLOR = '#000000';
+export const ANNOTATION_PROGRESS_TRACK_COLOR = '#9e9e9e';
+
 /**
  * Emoji → progress colors.
  * Keys are stored without U+FE0F so ☀️ and ☀ match the same entry.
@@ -51,6 +55,16 @@ function stripVariationSelectors(text: string): string {
 /** Drop parenthetical annotations so emojis inside them do not change color. */
 function textOutsideParentheses(text: string): string {
   return text.replace(/\([^()]*\)/g, '');
+}
+
+/**
+ * True when the whole line is annotation(s) in parentheses, e.g. "(Big big big big)".
+ * Does not match empty silence lines or lines with lyrics outside (...).
+ */
+export function isAnnotationOnlyLine(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  return textOutsideParentheses(trimmed).trim() === '';
 }
 
 /**
@@ -119,6 +133,9 @@ function findUpcomingProgressEmoji<T extends {text: string}>(
  *
  * Empty lines (♪ / line zero) preview the next non-empty line's emoji
  * color when present; otherwise they keep the carried color.
+ *
+ * Annotation-only lines like "(Big big big big)" use black and do not
+ * change the carried section color.
  */
 export function applyEmojiProgressColors<T extends {text: string}>(
   lines: T[],
@@ -135,6 +152,14 @@ export function applyEmojiProgressColors<T extends {text: string}>(
         ...line,
         progressColor: upcoming?.progressColor ?? progressColor,
         progressTrackColor: upcoming?.progressTrackColor ?? progressTrackColor,
+      };
+    }
+
+    if (isAnnotationOnlyLine(line.text)) {
+      return {
+        ...line,
+        progressColor: ANNOTATION_PROGRESS_COLOR,
+        progressTrackColor: ANNOTATION_PROGRESS_TRACK_COLOR,
       };
     }
 
