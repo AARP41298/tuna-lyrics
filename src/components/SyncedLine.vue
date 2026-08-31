@@ -54,9 +54,8 @@ const isClosingSilence = computed(
   () => !!props.isLast && !props.line.text.trim(),
 );
 
-const closingGone = computed(
-  () => isClosingSilence.value && props.current - props.line.timeInMs >= 3000,
-);
+const CLOSING_HOLD_MS = 4000;
+const CLOSING_FADE_MS = 1000;
 
 const cuenta3 = computed(() => {
   const remaining = props.line.timeInMs - props.current
@@ -98,8 +97,9 @@ const opacity = computed(() => {
       return Math.max(Math.log1p(t * 9) / Math.log1p(9), 0);
     }
     const elapsed = props.current - props.line.timeInMs;
-    if (elapsed >= 3000) return 0;
-    return 1;
+    if (elapsed <= CLOSING_HOLD_MS) return 1;
+    if (elapsed >= CLOSING_HOLD_MS + CLOSING_FADE_MS) return 0;
+    return 1 - (elapsed - CLOSING_HOLD_MS) / CLOSING_FADE_MS;
   }
 
   if (status.value === 'current') return 1;
@@ -443,12 +443,12 @@ const progressStyle = computed(() => ({
     ref="refLine"
     class="col-12"
     :class="{
-      'leading-silence': isLeadingSilence || closingGone,
+      'leading-silence': isLeadingSilence,
     }"
-    :style="{ opacity: isLeadingSilence || closingGone ? 0 : opacity }"
-    :aria-hidden="isLeadingSilence || closingGone"
+    :style="{ opacity: isLeadingSilence ? 0 : opacity }"
+    :aria-hidden="isLeadingSilence || (isClosingSilence && opacity <= 0)"
   >
-    <template v-if="!isLeadingSilence && !closingGone">
+    <template v-if="!isLeadingSilence">
     <div v-if="!text">
 
     </div>
