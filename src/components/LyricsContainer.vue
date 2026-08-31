@@ -370,6 +370,7 @@ const centerOffset = heightStore.height / 2
         v-for="(l, i) in lines" :key="i"
         :line="l"
         :index="i"
+        :is-last="i === lines.length - 1"
         :current="currentTime"
         :durationMs="durationMs"
         :artists="searchResult?.artists ?? []"

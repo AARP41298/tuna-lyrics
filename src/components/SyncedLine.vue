@@ -24,6 +24,7 @@ const props = defineProps<{
   current: number;
   durationMs: number;
   index: number;
+  isLast?: boolean;
   artists?: string[];
 }>()
 
@@ -35,6 +36,20 @@ const status = computed(() => {
   if (props.current - props.line.timeInMs >= props.line.duration) return 'previous';
   return 'current';
 });
+
+/** Injected empty line at t=0 — keep for timing, hide ♪ + countdown (always showed "3"). */
+const isLeadingSilence = computed(
+  () => props.index === 0 && !props.line.text.trim(),
+);
+
+/** Final empty silence → thank-you message instead of ♪. */
+const isClosingSilence = computed(
+  () => !!props.isLast && !props.line.text.trim(),
+);
+
+const closingGone = computed(
+  () => isClosingSilence.value && props.current - props.line.timeInMs >= 3000,
+);
 
 const cuenta3 = computed(() => {
   const remaining = props.line.timeInMs - props.current
@@ -67,6 +82,19 @@ const prog3 = computed(() => {
 
 
 const opacity = computed(() => {
+  if (isClosingSilence.value) {
+    if (props.current < props.line.timeInMs) {
+      const abs = props.line.timeInMs - props.current;
+      const maxDiff = 5000;
+      const clamped = Math.min(abs, maxDiff);
+      const t = 1 - clamped / maxDiff;
+      return Math.max(Math.log1p(t * 9) / Math.log1p(9), 0);
+    }
+    const elapsed = props.current - props.line.timeInMs;
+    if (elapsed >= 3000) return 0;
+    return 1;
+  }
+
   if (status.value === 'current') return 1;
 
   const abs = Math.abs(props.line.timeInMs - props.current);
@@ -234,6 +262,9 @@ onMounted(() => {
 
 
 const text = computed(() => {
+  if (isClosingSilence.value) {
+    return 'Gracias por ver 🫰';
+  }
   if (!props.line.text.trim()) {
     // return config()?.defaultTextString ?? '';
     const param = route.query.defaultText
@@ -253,6 +284,23 @@ const romanization = ref('')
 const showRomanji = ref(false);
 const small = ref('')
 onBeforeMount(async () => {
+  if (isLeadingSilence.value) {
+    romanizedStore.lineReady()
+    return
+  }
+
+  if (isClosingSilence.value) {
+    onlyKanjis = text.value
+    onlyFurigana = text.value
+    romanization.value = 'Thanks for watching'
+    showRomanji.value = true
+    romanizedStore.lineReady()
+    await nextTick()
+    applySpecialFonts(wordRefs.value)
+    applySpecialFonts(romanjiRefs.value)
+    return
+  }
+
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
   onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
@@ -299,8 +347,16 @@ const progressStyle = computed(() => ({
 </script>
 
 <template>
-  <div ref="refLine" class="col-12" :style="{'opacity': opacity}">
-
+  <div
+    ref="refLine"
+    class="col-12"
+    :class="{
+      'leading-silence': isLeadingSilence || closingGone,
+    }"
+    :style="{ opacity: isLeadingSilence || closingGone ? 0 : opacity }"
+    :aria-hidden="isLeadingSilence || closingGone"
+  >
+    <template v-if="!isLeadingSilence && !closingGone">
     <div v-if="!text">
 
     </div>
@@ -323,7 +379,7 @@ const progressStyle = computed(() => ({
           <div class="row justify-center items-center">
             <!--              color="teal"-->
             <q-circular-progress
-              v-if="!showRomanji"
+              v-if="!showRomanji && !isClosingSilence"
               show-value
               instant-feedback
               :font-size="(maxFont-1)+'vh'"
@@ -340,12 +396,20 @@ const progressStyle = computed(() => ({
                   :ref="el=>setWordRef(el,index)">
                     {{ word }}&ensp;
             </span>
+            <img
+              v-if="isClosingSilence"
+              class="mexico-flag"
+              :style="{ height: baseFont + 'vh' }"
+              src="/icons/flag-mexico.png"
+              alt="🇲🇽"
+            >
           </div>
 
           <!--        TODO: config()?.romanization-->
           <div class="romaji row justify-center texto-con-borde-grueso"
                v-if="showRomanji">
             <q-circular-progress
+              v-if="!isClosingSilence"
               show-value
               instant-feedback
               :font-size="(maxFont-1)+'vh'"
@@ -370,6 +434,7 @@ const progressStyle = computed(() => ({
       </div>
 
     </div>
+    </template>
   </div>
 
 
@@ -385,6 +450,18 @@ const progressStyle = computed(() => ({
 
 :deep(.emoji-progress .q-circular-progress__track) {
   stroke: var(--progress-track-color, #e0e0e0);
+}
+
+.leading-silence {
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mexico-flag {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.15em;
 }
 
 .current {
