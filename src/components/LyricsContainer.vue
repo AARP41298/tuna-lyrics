@@ -247,7 +247,7 @@ async function seekToFrame(frame: number) {
   emits('update-time', currentTime.value)
   await nextTick(updateLineHeights)
   await waitUntilAllReady()
-  await nextTick()
+  await nextTick(updateLineHeights)
   // await sleep(2000)
   await nextTick()
 }
@@ -361,7 +361,7 @@ const centerOffset = heightStore.height / 2
       ＼(〇_ｏ)／
     </div>
 
-    <div v-else-if="lines">
+    <div v-else-if="lines" class="col-12">
       <!--      <span style="font-size: 3rem; color: white; float: left">
             {{ rFrame }} - {{ currentTime }}
             </span>-->

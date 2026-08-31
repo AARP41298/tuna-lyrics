@@ -29,6 +29,13 @@ const props = defineProps<{
 }>()
 
 const durationDiv = ref<HTMLDivElement | null>(null);
+const refLine = ref<HTMLDivElement | null>(null);
+const kanjiRow = ref<HTMLDivElement | null>(null);
+const romanjiRow = ref<HTMLDivElement | null>(null);
+
+/** Word indices that start a new visual line (pre-wrapped at max font). */
+const kanjiBreakBefore = ref<number[]>([]);
+const romanjiBreakBefore = ref<number[]>([]);
 
 const status = computed(() => {
 
@@ -184,6 +191,86 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
   el.style.fontSize = `${fontSize}vh`;
 }
 
+function getMeasureWidth(): number {
+  const scene = document.getElementById('scene');
+  if (scene && scene.clientWidth > 0) return scene.clientWidth;
+
+  const container = document.querySelector('.lyric-container');
+  if (container instanceof HTMLElement && container.clientWidth > 0) {
+    return container.clientWidth;
+  }
+
+  return 0;
+}
+
+/**
+ * Simulate the line at max (bold) font inside a hidden clone and record
+ * where flex-wrap would split, so those breaks exist before words pop in.
+ * Width must be the full scene — the live row shrink-wraps to current text,
+ * which would otherwise look like a wrap every 2–3 words.
+ */
+function findWrapBreaks(
+  row: HTMLElement | null,
+  measureFontVh: number,
+): number[] {
+  if (!row) return [];
+
+  const availableWidth = getMeasureWidth();
+  const mountAt = document.getElementById('scene') ?? durationDiv.value ?? refLine.value;
+  if (!mountAt || availableWidth <= 0) return [];
+
+  const wordCount = row.querySelectorAll(':scope > .lyric-word').length;
+  if (wordCount < 2) return [];
+
+  const clone = row.cloneNode(true) as HTMLElement;
+  clone.classList.add('lyric-measure-clone');
+  clone.classList.remove('items-center');
+  clone.style.alignItems = 'flex-start';
+  clone.style.fontFamily = 'Verdana, sans-serif';
+  clone.style.boxSizing = 'border-box';
+  clone.style.position = 'absolute';
+  clone.style.visibility = 'hidden';
+  clone.style.pointerEvents = 'none';
+  clone.style.left = '0';
+  clone.style.top = '0';
+  clone.style.width = `${availableWidth}px`;
+  clone.style.minWidth = `${availableWidth}px`;
+  clone.style.maxWidth = `${availableWidth}px`;
+  clone.querySelectorAll('.lyric-line-break').forEach((el) => el.remove());
+
+  clone.querySelectorAll<HTMLElement>(':scope > .lyric-word').forEach((el) => {
+    el.style.fontSize = `${measureFontVh}vh`;
+    el.style.fontWeight = 'bold';
+    el.style.flexShrink = '0';
+  });
+
+  mountAt.appendChild(clone);
+
+  try {
+    const cloneWords = clone.querySelectorAll<HTMLElement>(':scope > .lyric-word');
+    const breaks: number[] = [];
+    let lastTop = cloneWords[0]?.offsetTop ?? 0;
+    for (let i = 1; i < cloneWords.length; i++) {
+      const wordEl = cloneWords[i];
+      if (!wordEl) continue;
+      const top = wordEl.offsetTop;
+      if (top > lastTop + 1) {
+        breaks.push(i);
+        lastTop = top;
+      }
+    }
+    return breaks;
+  } finally {
+    clone.remove();
+  }
+}
+
+function lockWraps() {
+  const kanjiFont = small.value === 'small' ? heightStore.smallFont : maxFont;
+  kanjiBreakBefore.value = findWrapBreaks(kanjiRow.value, kanjiFont);
+  romanjiBreakBefore.value = findWrapBreaks(romanjiRow.value, maxFont);
+}
+
 const bigbangWordCores = new Set([
   'BIG',
   'BANG',
@@ -256,8 +343,10 @@ function applySpecialFonts(els: (HTMLElement | null)[]) {
   });
 }
 
-onMounted(() => {
+onMounted(async () => {
   applySpecialFonts(wordRefs.value)
+  await nextTick()
+  lockWraps()
 })
 
 
@@ -294,10 +383,12 @@ onBeforeMount(async () => {
     onlyFurigana = text.value
     romanization.value = 'Thanks for watching'
     showRomanji.value = true
-    romanizedStore.lineReady()
     await nextTick()
     applySpecialFonts(wordRefs.value)
     applySpecialFonts(romanjiRefs.value)
+    await nextTick()
+    lockWraps()
+    romanizedStore.lineReady()
     return
   }
 
@@ -319,11 +410,12 @@ onBeforeMount(async () => {
     small.value = 'small'
   }
 
-  romanizedStore.lineReady()
-
   await nextTick()
   applySpecialFonts(wordRefs.value)
   applySpecialFonts(romanjiRefs.value)
+  await nextTick()
+  lockWraps()
+  romanizedStore.lineReady()
 })
 
 
@@ -376,7 +468,7 @@ const progressStyle = computed(() => ({
           ref="durationDiv"
         >
 
-          <div class="row justify-center items-center">
+          <div ref="kanjiRow" class="row justify-center items-center">
             <!--              color="teal"-->
             <q-circular-progress
               v-if="!showRomanji && !isClosingSilence"
@@ -392,10 +484,18 @@ const progressStyle = computed(() => ({
             >
               {{ cuenta3 }}
             </q-circular-progress>
-            <span v-for="(word, index) in onlyKanjis.split(' ')" :key="index"
-                  :ref="el=>setWordRef(el,index)">
+            <template v-for="(word, index) in onlyKanjis.split(' ')" :key="'k-'+index">
+              <div
+                v-if="kanjiBreakBefore.includes(index)"
+                class="lyric-line-break"
+              />
+              <span
+                class="lyric-word"
+                :ref="el=>setWordRef(el,index)"
+              >
                     {{ word }}&ensp;
-            </span>
+              </span>
+            </template>
             <img
               v-if="isClosingSilence"
               class="mexico-flag"
@@ -407,6 +507,7 @@ const progressStyle = computed(() => ({
 
           <!--        TODO: config()?.romanization-->
           <div class="romaji row justify-center texto-con-borde-grueso"
+               ref="romanjiRow"
                v-if="showRomanji">
             <q-circular-progress
               v-if="!isClosingSilence"
@@ -422,12 +523,20 @@ const progressStyle = computed(() => ({
             >
               {{ cuenta3 }}
             </q-circular-progress>
-            <span v-for="(word, index) in romanization.split(' ')" :key="index"
-                  :ref="el=>setRomanjiRef(el,index)">
+            <template v-for="(word, index) in romanization.split(' ')" :key="'r-'+index">
+              <div
+                v-if="romanjiBreakBefore.includes(index)"
+                class="lyric-line-break"
+              />
+              <span
+                class="lyric-word"
+                :ref="el=>setRomanjiRef(el,index)"
+              >
   <!--                      <yt-formatted-string>-->
                   {{ word }}&ensp;
               <!--                      </yt-formatted-string>-->
-            </span>
+              </span>
+            </template>
           </div>
 
         </div>
@@ -456,6 +565,29 @@ const progressStyle = computed(() => ({
   height: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+.text-lyrics {
+  position: relative;
+}
+
+.lyric-line-break {
+  flex-basis: 100%;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: none;
+  pointer-events: none;
+}
+
+.lyric-measure-clone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .mexico-flag {
