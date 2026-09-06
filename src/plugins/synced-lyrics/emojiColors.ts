@@ -6,7 +6,7 @@ export type EmojiProgressColor = {
 };
 
 /** Default arc color when no emoji has been seen yet */
-export const DEFAULT_PROGRESS_COLOR = '#2c00cc';
+export const DEFAULT_PROGRESS_COLOR = '#00ff00';
 
 /** Default track when no override is set (Quasar grey-3-ish) */
 export const DEFAULT_PROGRESS_TRACK_COLOR = '#e0e0e0';
@@ -26,11 +26,11 @@ export const EMOJI_PROGRESS_COLORS: Record<string, EmojiProgressColor> = {
   '🟡': {color: '#fdd835', trackColor: '#9e9e9e'},
 
   // BIGBANG-style member markers
-  '🐰': {color: '#ffffff', trackColor: '#757575'},
-  '🐲': {color: '#43a047'},
-  '☀': {color: '#ff9800'},
-  '🐯': {color: '#ffb300'},
-  '🐼': {color: '#212121', trackColor: '#bdbdbd'},
+  '🐰': {color: '#ccc4d5', trackColor: '#ff9286'},
+  '🐲': {color: '#f50a8c'},
+  '☀': {color: '#fdce38'},
+  '🐯': {color: '#fd8827'},
+  '🐼': {color: '#423f6c', trackColor: '#f2f2f2'},
 
   // Other lyrics markers used in local LRC files
   '🌸': {color: '#ec407a'},
