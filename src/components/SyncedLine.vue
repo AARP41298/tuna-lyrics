@@ -148,10 +148,19 @@ const heightStore = useHeightStore();
 
 const baseFont = heightStore.baseFont;
 const maxFont = heightStore.maxFont;  // 1080->4 1440->5 2160->6
+const maxFontCss = computed(() => `${heightStore.maxFont}vh`);
 
 
-const wordDelay = 100; // ms entre inicios de palabras
+const wordDelay = 100; // fallback ms between words when no timed words exist
 const growTime = 100; // ms que tarda en llegar al max
+
+function wordStartMs(index: number): number {
+  const timed = props.line.words;
+  if (timed && timed.length > 0) {
+    return timed[Math.min(index, timed.length - 1)]?.timeInMs ?? props.line.timeInMs;
+  }
+  return props.line.timeInMs + index * wordDelay;
+}
 
 const smallKanji = route.query.smallKanji ?? false
 const romanizedStore = useRomanizedStore()
@@ -182,29 +191,29 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
   if (!el) return;
   if (small === 'small') {
     el.style.fontSize = `${heightStore.smallFont}vh`;
-    return;
-  }
-  if (status.value !== 'current') {
-    el.style.fontSize = `${baseFont}vh`;
+    el.style.fontWeight = '';
     return;
   }
 
-  const startTime = props.line.timeInMs + index * wordDelay;
+  const startTime = wordStartMs(index);
   const endTime = startTime + growTime;
+  const lineFinished = status.value === 'previous';
+  const hasStarted = lineFinished || current >= startTime;
 
-  let fontSize = baseFont;
-
-  if (current >= startTime) {
-    if (current <= endTime) {
-      // Progreso de 0 a 1 durante el crecimiento
-      const t = (current - startTime) / growTime;
-      fontSize = baseFont + (maxFont - baseFont) * t;
-    } else {
-      // Ya creció al máximo → mantener en 4rem
-      fontSize = maxFont;
-    }
+  if (!hasStarted) {
+    el.style.fontSize = `${baseFont}vh`;
+    el.style.fontWeight = '';
+    return;
   }
+
+  let fontSize = maxFont;
+  if (!lineFinished && current <= endTime) {
+    const t = (current - startTime) / growTime;
+    fontSize = baseFont + (maxFont - baseFont) * t;
+  }
+
   el.style.fontSize = `${fontSize}vh`;
+  el.style.fontWeight = 'bold';
 }
 
 function getMeasureWidth(): number {
@@ -379,9 +388,19 @@ const text = computed(() => {
   return props.line.text;
 });
 
+const displayWords = computed(() => {
+  if (isClosingSilence.value || isLeadingSilence.value) {
+    return onlyKanjis.value.split(' ');
+  }
+  if (props.line.words?.length) {
+    return props.line.words.map((word) => word.word.trimEnd());
+  }
+  return onlyKanjis.value.split(' ');
+});
+
 
 let onlyFurigana = "";
-let onlyKanjis = "";
+const onlyKanjis = ref("");
 
 const romanization = ref('')
 
@@ -395,7 +414,7 @@ onBeforeMount(async () => {
   }
 
   if (isClosingSilence.value) {
-    onlyKanjis = text.value
+    onlyKanjis.value = text.value
     onlyFurigana = text.value
     romanization.value = 'Thanks for watching'
     showRomanji.value = true
@@ -410,7 +429,7 @@ onBeforeMount(async () => {
 
   //TODO: configurable romanization
   // if (!config()?.romanization) return;
-  onlyKanjis = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
+  onlyKanjis.value = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$1');
   onlyFurigana = text.value.replace(/\(([^|]+)\|([^)]+)\)/g, '$2');
   const input = canonicalize(onlyFurigana);
 
@@ -500,7 +519,7 @@ const progressStyle = computed(() => ({
             >
               {{ cuenta3 }}
             </q-circular-progress>
-            <template v-for="(word, index) in onlyKanjis.split(' ')" :key="'k-'+index">
+            <template v-for="(word, index) in displayWords" :key="'k-'+index">
               <div
                 v-if="kanjiBreakBefore.includes(index)"
                 class="lyric-line-break"
@@ -612,16 +631,18 @@ const progressStyle = computed(() => ({
   margin-left: 0.15em;
 }
 
-.current {
+.current,
+.previous {
   font-weight: bold;
-  //font-size: 4rem;
-
 }
 
-.upcoming, .previous {
-  font-weight: normal;
-  //font-size: 3rem;
+.previous .lyric-word {
+  font-size: v-bind(maxFontCss);
+  font-weight: bold;
+}
 
+.upcoming {
+  font-weight: normal;
 }
 
 .upcoming, .previous, .current {

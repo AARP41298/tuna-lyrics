@@ -12,6 +12,12 @@ export type SyncedLyricsPluginConfig = {
 
 export type LineLyricsStatus = 'previous' | 'current' | 'upcoming';
 
+export type LineWord = {
+  timeInMs: number;
+  word: string;
+  duration?: number | undefined;
+};
+
 export type LineLyrics = {
   time: string;
   timeInMs: number;
@@ -19,6 +25,8 @@ export type LineLyrics = {
 
   text: string;
   status: LineLyricsStatus;
+  /** Word- or segment-level sync; used for timed highlighting when present. */
+  words?: LineWord[];
 
   /** Circular-progress arc color derived from section emojis */
   progressColor?: string;

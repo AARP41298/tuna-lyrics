@@ -1,0 +1,1115 @@
+version: "1.0"
+metadata:
+  title: Supernova
+  artist: Hybrid Minds, Catching Cairo
+  instrumental: false
+  album: Supernova
+  duration_ms: 297960
+lines:
+  - text: Said I'd look for you
+    words:
+      - text: "Said "
+        start_ms: 20610
+      - text: "I'd "
+        start_ms: 21049
+      - text: "look "
+        start_ms: 21809
+      - text: "for "
+        start_ms: 22529
+      - text: you
+        start_ms: 22929
+    start_ms: 20610
+    end_ms: 23890
+  - text: In the dark sky
+    words:
+      - text: "In "
+        start_ms: 24089
+      - text: "the "
+        start_ms: 24279
+      - text: "dark "
+        start_ms: 24599
+      - text: sky
+        start_ms: 25209
+    start_ms: 24089
+    end_ms: 26420
+  - text: Somewhere way up high like where the stars collide
+    words:
+      - text: "Somewhere "
+        start_ms: 26828
+      - text: "way "
+        start_ms: 27407
+      - text: "up "
+        start_ms: 27797
+      - text: "high "
+        start_ms: 28087
+      - text: "like "
+        start_ms: 28377
+      - text: "where "
+        start_ms: 28797
+      - text: "the "
+        start_ms: 29108
+      - text: "stars "
+        start_ms: 29498
+      - text: collide
+        start_ms: 30248
+    start_ms: 26828
+    end_ms: 31717
+  - text: And we do
+    words:
+      - text: "And "
+        start_ms: 32407
+      - text: "we "
+        start_ms: 32857
+      - text: do
+        start_ms: 33567
+    start_ms: 32407
+    end_ms: 34236
+  - text: Hard to find
+    words:
+      - text: "Hard "
+        start_ms: 35087
+      - text: "to "
+        start_ms: 35527
+      - text: find
+        start_ms: 36247
+    start_ms: 35087
+    end_ms: 37196
+  - text: You're a world apart but still I'm gonna bind to you
+    words:
+      - text: "You're "
+        start_ms: 37886
+      - text: "a "
+        start_ms: 38255
+      - text: "world "
+        start_ms: 38456
+      - text: "apart "
+        start_ms: 38855
+      - text: "but "
+        start_ms: 39415
+      - text: "still "
+        start_ms: 39785
+      - text: "I'm "
+        start_ms: 40145
+      - text: "gonna "
+        start_ms: 40495
+      - text: "bind "
+        start_ms: 41275
+      - text: "to "
+        start_ms: 42475
+      - text: you
+        start_ms: 42645
+    start_ms: 37886
+    end_ms: 43186
+  - text: And we move like satellites
+    words:
+      - text: "And "
+        start_ms: 43655
+      - text: "we "
+        start_ms: 44185
+      - text: "move "
+        start_ms: 44865
+      - text: "like "
+        start_ms: 46484
+      - text: satellites
+        start_ms: 46854
+    start_ms: 43655
+    end_ms: 51484
+  - text: And we move like satellites
+    words:
+      - text: "And "
+        start_ms: 54454
+      - text: "we "
+        start_ms: 54929
+      - text: "move "
+        start_ms: 55609
+      - text: "like "
+        start_ms: 57609
+      - text: satellites
+        start_ms: 58009
+    start_ms: 54454
+    end_ms: 61973
+  - text: I'm running to you
+    words:
+      - text: "I'm "
+        start_ms: 65349
+      - text: "running "
+        start_ms: 65518
+      - text: "to "
+        start_ms: 65758
+      - text: you
+        start_ms: 66238
+    start_ms: 65349
+    end_ms: 67498
+  - text: And I choose
+    words:
+      - text: "And "
+        start_ms: 68239
+      - text: "I "
+        start_ms: 68588
+      - text: choose
+        start_ms: 69218
+    start_ms: 68239
+    end_ms: 70350
+  - text: To pull you in closer
+    words:
+      - text: "To "
+        start_ms: 71429
+      - text: "pull "
+        start_ms: 71588
+      - text: "you "
+        start_ms: 72258
+      - text: "in "
+        start_ms: 72578
+      - text: closer
+        start_ms: 73108
+    start_ms: 71429
+    end_ms: 74220
+  - text: You're the supernova
+    words:
+      - text: "You're "
+        start_ms: 74538
+      - text: "the "
+        start_ms: 74847
+      - text: supernova
+        start_ms: 75017
+    start_ms: 74538
+    end_ms: 76447
+  - text: I'll choose
+    words:
+      - text: "I'll "
+        start_ms: 76447
+      - text: choose
+        start_ms: 77646
+    start_ms: 76447
+    end_ms: 79150
+  - text: To run for you
+    words:
+      - text: "To "
+        start_ms: 79218
+      - text: "run "
+        start_ms: 79388
+      - text: "for "
+        start_ms: 79738
+      - text: you
+        start_ms: 80378
+    start_ms: 79218
+    end_ms: 81527
+  - text: Pull you in closer
+    words:
+      - text: "Pull "
+        start_ms: 82618
+      - text: "you "
+        start_ms: 83268
+      - text: "in "
+        start_ms: 83658
+      - text: closer
+        start_ms: 84138
+    start_ms: 82618
+    end_ms: 85170
+  - text: You're the superno, you're the supernova
+    words:
+      - text: "You're "
+        start_ms: 85578
+      - text: "the "
+        start_ms: 85857
+      - text: "superno, "
+        start_ms: 86087
+      - text: "you're "
+        start_ms: 86887
+      - text: "the "
+        start_ms: 87287
+      - text: supernova
+        start_ms: 87447
+    start_ms: 85578
+    end_ms: 89087
+  - text: va... va... va... va... va...
+    words:
+      - text: "va... "
+        start_ms: 89257
+      - text: "va... "
+        start_ms: 89957
+      - text: "va... "
+        start_ms: 90637
+      - text: "va... "
+        start_ms: 91347
+      - text: va...
+        start_ms: 91997
+    start_ms: 89257
+    end_ms: 92637
+  - text: Mhmh
+    words:
+      - text: Mhmh
+        start_ms: 92806
+    start_ms: 92806
+    end_ms: 94075
+  - text: You're the supernova
+    words:
+      - text: "You're "
+        start_ms: 97967
+      - text: "the "
+        start_ms: 98215
+      - text: supernova
+        start_ms: 98415
+    start_ms: 97967
+    end_ms: 100216
+  - text: va... va... va... va... va...
+    words:
+      - text: "va... "
+        start_ms: 100216
+      - text: "va... "
+        start_ms: 100976
+      - text: "va... "
+        start_ms: 101606
+      - text: "va... "
+        start_ms: 102366
+      - text: va...
+        start_ms: 102936
+    start_ms: 100216
+    end_ms: 103635
+  - text: Mhmh
+    words:
+      - text: Mhmh
+        start_ms: 103635
+    start_ms: 103635
+    end_ms: 105194
+  - text: And I'm checking off the list
+    words:
+      - text: "And "
+        start_ms: 109673
+      - text: "I'm "
+        start_ms: 109993
+      - text: "checking "
+        start_ms: 110303
+      - text: "off "
+        start_ms: 110913
+      - text: "the "
+        start_ms: 111153
+      - text: list
+        start_ms: 111633
+    start_ms: 109673
+    end_ms: 112280
+  - text: Of the stars that I found
+    words:
+      - text: "Of "
+        start_ms: 112412
+      - text: "the "
+        start_ms: 112742
+      - text: "stars "
+        start_ms: 113382
+      - text: "that "
+        start_ms: 114022
+      - text: "I "
+        start_ms: 114252
+      - text: found
+        start_ms: 114532
+    start_ms: 112412
+    end_ms: 115061
+  - text: And I'm looking out for all the things I never could find
+    words:
+      - text: "And "
+        start_ms: 115061
+      - text: "I'm "
+        start_ms: 115221
+      - text: "looking "
+        start_ms: 115571
+      - text: "out "
+        start_ms: 116070
+      - text: "for "
+        start_ms: 116701
+      - text: "all "
+        start_ms: 117061
+      - text: "the "
+        start_ms: 117710
+      - text: "things "
+        start_ms: 117860
+      - text: "I "
+        start_ms: 118160
+      - text: "never "
+        start_ms: 118520
+      - text: "could "
+        start_ms: 118860
+      - text: find
+        start_ms: 119170
+    start_ms: 115061
+    end_ms: 120181
+  - text: Now we are worlds apart
+    words:
+      - text: "Now "
+        start_ms: 120731
+      - text: "we "
+        start_ms: 120950
+      - text: "are "
+        start_ms: 121160
+      - text: "worlds "
+        start_ms: 121450
+      - text: apart
+        start_ms: 122180
+    start_ms: 120731
+    end_ms: 123530
+  - text: I am closer to you guess I can say I'm round
+    words:
+      - text: "I "
+        start_ms: 123751
+      - text: "am "
+        start_ms: 123810
+      - text: "closer "
+        start_ms: 124130
+      - text: "to "
+        start_ms: 124620
+      - text: "you "
+        start_ms: 124770
+      - text: "guess "
+        start_ms: 125090
+      - text: "I "
+        start_ms: 125320
+      - text: "can "
+        start_ms: 125520
+      - text: "say "
+        start_ms: 125850
+      - text: "I'm "
+        start_ms: 126280
+      - text: round
+        start_ms: 126560
+    start_ms: 123751
+    end_ms: 127300
+  - text: Cause we move like satellites
+    words:
+      - text: "Cause "
+        start_ms: 131790
+      - text: "we "
+        start_ms: 132190
+      - text: "move "
+        start_ms: 132830
+      - text: "like "
+        start_ms: 134840
+      - text: satellites
+        start_ms: 135160
+    start_ms: 131790
+    end_ms: 137180
+  - text: You shine so bright
+    words:
+      - text: "You "
+        start_ms: 137230
+      - text: "shine "
+        start_ms: 137600
+      - text: "so "
+        start_ms: 138590
+      - text: bright
+        start_ms: 138990
+    start_ms: 137230
+    end_ms: 139500
+  - text: "'Cause you're the supernova"
+    words:
+      - text: "'Cause "
+        start_ms: 139720
+      - text: "you're "
+        start_ms: 139969
+      - text: "the "
+        start_ms: 140229
+      - text: supernova
+        start_ms: 140699
+    start_ms: 139720
+    end_ms: 142050
+  - text: And though we're worlds apart
+    words:
+      - text: "And "
+        start_ms: 142089
+      - text: "though "
+        start_ms: 142409
+      - text: "we're "
+        start_ms: 142729
+      - text: "worlds "
+        start_ms: 143139
+      - text: apart
+        start_ms: 144169
+    start_ms: 142089
+    end_ms: 145050
+  - text: You're in my heart
+    words:
+      - text: "You're "
+        start_ms: 145499
+      - text: "in "
+        start_ms: 145889
+      - text: "my "
+        start_ms: 146889
+      - text: heart
+        start_ms: 147249
+    start_ms: 145499
+    end_ms: 147850
+  - text: I'll pull you in, no, oh oh
+    words:
+      - text: "I'll "
+        start_ms: 147908
+      - text: "pull "
+        start_ms: 148467
+      - text: "you "
+        start_ms: 149287
+      - text: "in, "
+        start_ms: 149957
+      - text: "no, "
+        start_ms: 151317
+      - text: "oh "
+        start_ms: 151827
+      - text: oh
+        start_ms: 152197
+    start_ms: 147908
+    end_ms: 153657
+  - text: I'm running to you
+    words:
+      - text: "I'm "
+        start_ms: 153657
+      - text: "running "
+        start_ms: 153827
+      - text: "to "
+        start_ms: 154097
+      - text: you
+        start_ms: 154516
+    start_ms: 153657
+    end_ms: 156180
+  - text: And I'll choose
+    words:
+      - text: "And "
+        start_ms: 156517
+      - text: "I'll "
+        start_ms: 156947
+      - text: choose
+        start_ms: 157627
+    start_ms: 156517
+    end_ms: 159120
+  - text: To pull you in closer
+    words:
+      - text: "To "
+        start_ms: 159667
+      - text: "pull "
+        start_ms: 159837
+      - text: "you "
+        start_ms: 160547
+      - text: "in "
+        start_ms: 160947
+      - text: closer
+        start_ms: 161437
+    start_ms: 159667
+    end_ms: 162320
+  - text: You're the supernova
+    words:
+      - text: "You're "
+        start_ms: 162827
+      - text: "the "
+        start_ms: 163066
+      - text: supernova
+        start_ms: 163226
+    start_ms: 162827
+    end_ms: 164530
+  - text: I'm running for you
+    words:
+      - text: "I'm "
+        start_ms: 164717
+      - text: "running "
+        start_ms: 164867
+      - text: "for "
+        start_ms: 165027
+      - text: you
+        start_ms: 165547
+    start_ms: 164717
+    end_ms: 167380
+  - text: And I choose
+    words:
+      - text: "And "
+        start_ms: 167566
+      - text: "I "
+        start_ms: 167966
+      - text: choose
+        start_ms: 168646
+    start_ms: 167566
+    end_ms: 170430
+  - text: To pull you in closer
+    words:
+      - text: "To "
+        start_ms: 170606
+      - text: "pull "
+        start_ms: 170856
+      - text: "you "
+        start_ms: 171575
+      - text: "in "
+        start_ms: 172046
+      - text: closer
+        start_ms: 172446
+    start_ms: 170606
+    end_ms: 173400
+  - text: You're the super supernova
+    words:
+      - text: "You're "
+        start_ms: 173846
+      - text: "the "
+        start_ms: 174286
+      - text: "super "
+        start_ms: 174606
+      - text: supernova
+        start_ms: 175286
+    start_ms: 173846
+    end_ms: 177966
+  - text: Mhmh
+    words: []
+    start_ms: 181015
+    end_ms: 183495
+  - text: I told you, you are a supernova
+    words:
+      - text: "I "
+        start_ms: 198811
+      - text: "told "
+        start_ms: 198970
+      - text: "you, "
+        start_ms: 199360
+      - text: "you "
+        start_ms: 199610
+      - text: "are "
+        start_ms: 199690
+      - text: "a "
+        start_ms: 199840
+      - text: supernova
+        start_ms: 200090
+    start_ms: 198811
+    end_ms: 201370
+  - text: Baby let me get a closer look at you
+    words:
+      - text: "Baby "
+        start_ms: 201370
+      - text: "let "
+        start_ms: 201615
+      - text: "me "
+        start_ms: 201765
+      - text: "get "
+        start_ms: 201965
+      - text: "a "
+        start_ms: 202165
+      - text: "closer "
+        start_ms: 202335
+      - text: "look "
+        start_ms: 202601
+      - text: "at "
+        start_ms: 203149
+      - text: you
+        start_ms: 203415
+    start_ms: 201370
+    end_ms: 203739
+  - text: "'Cause you shine so bright in my eyes"
+    words:
+      - text: "'Cause "
+        start_ms: 203739
+      - text: "you "
+        start_ms: 203852
+      - text: "shine "
+        start_ms: 204052
+      - text: "so "
+        start_ms: 204458
+      - text: "bright "
+        start_ms: 204828
+      - text: "in "
+        start_ms: 205062
+      - text: "my "
+        start_ms: 205212
+      - text: eyes
+        start_ms: 205732
+    start_ms: 203739
+    end_ms: 206868
+  - text: You can not, you can not, you can not
+    words:
+      - text: "You "
+        start_ms: 206868
+      - text: "can "
+        start_ms: 206998
+      - text: "not, "
+        start_ms: 207318
+      - text: "you "
+        start_ms: 207518
+      - text: "can "
+        start_ms: 207668
+      - text: "not, "
+        start_ms: 208028
+      - text: "you "
+        start_ms: 208198
+      - text: "can "
+        start_ms: 208398
+      - text: not
+        start_ms: 208708
+    start_ms: 206868
+    end_ms: 209268
+  - text: Ooh, shining bright you're a supernova
+    words:
+      - text: "Ooh, "
+        start_ms: 209268
+      - text: "shining "
+        start_ms: 209976
+      - text: "bright "
+        start_ms: 210286
+      - text: "you're "
+        start_ms: 210606
+      - text: "a "
+        start_ms: 210806
+      - text: supernova
+        start_ms: 210966
+    start_ms: 209268
+    end_ms: 212090
+  - text: Still I hold you tight but you're about to explode
+    words:
+      - text: "Still "
+        start_ms: 212251
+      - text: "I "
+        start_ms: 212610
+      - text: "hold "
+        start_ms: 212760
+      - text: "you "
+        start_ms: 212920
+      - text: "tight "
+        start_ms: 213120
+      - text: "but "
+        start_ms: 213240
+      - text: "you're "
+        start_ms: 213440
+      - text: "about "
+        start_ms: 213610
+      - text: "to "
+        start_ms: 213760
+      - text: explode
+        start_ms: 214190
+    start_ms: 212251
+    end_ms: 214830
+  - text: You are, you are, you are
+    words:
+      - text: "You "
+        start_ms: 215236
+      - text: "are, "
+        start_ms: 215590
+      - text: "you "
+        start_ms: 216270
+      - text: "are, "
+        start_ms: 216630
+      - text: "you "
+        start_ms: 217270
+      - text: are
+        start_ms: 217630
+    start_ms: 215236
+    end_ms: 218770
+  - text: I'm running to you
+    words:
+      - text: "I'm "
+        start_ms: 219945
+      - text: "running "
+        start_ms: 220045
+      - text: "to "
+        start_ms: 220325
+      - text: you
+        start_ms: 220725
+    start_ms: 219945
+    end_ms: 222360
+  - text: And I choose
+    words:
+      - text: "And "
+        start_ms: 222844
+      - text: "I "
+        start_ms: 223154
+      - text: choose
+        start_ms: 223844
+    start_ms: 222844
+    end_ms: 224843
+  - text: To pull you in closer
+    words:
+      - text: "To "
+        start_ms: 225814
+      - text: "pull "
+        start_ms: 226084
+      - text: "you "
+        start_ms: 226714
+      - text: "in "
+        start_ms: 227164
+      - text: closer
+        start_ms: 227634
+    start_ms: 225814
+    end_ms: 228950
+  - text: You're the supernova
+    words:
+      - text: "You're "
+        start_ms: 229004
+      - text: "the "
+        start_ms: 229314
+      - text: supernova
+        start_ms: 229493
+    start_ms: 229004
+    end_ms: 230630
+  - text: I'm running for you
+    words:
+      - text: "I'm "
+        start_ms: 231044
+      - text: "running "
+        start_ms: 231194
+      - text: "for "
+        start_ms: 231354
+      - text: you
+        start_ms: 231804
+    start_ms: 231044
+    end_ms: 233703
+  - text: And I choose
+    words:
+      - text: "And "
+        start_ms: 233703
+      - text: "I "
+        start_ms: 234076
+      - text: choose
+        start_ms: 234676
+    start_ms: 233703
+    end_ms: 236842
+  - text: To pull you in closer
+    words:
+      - text: "To "
+        start_ms: 236842
+      - text: "pull "
+        start_ms: 237035
+      - text: "you "
+        start_ms: 237745
+      - text: "in "
+        start_ms: 238271
+      - text: closer
+        start_ms: 238671
+    start_ms: 236842
+    end_ms: 239801
+  - text: You're the super supernova
+    words:
+      - text: "You're "
+        start_ms: 239992
+      - text: "the "
+        start_ms: 240422
+      - text: "super "
+        start_ms: 240782
+      - text: supernova
+        start_ms: 241382
+    start_ms: 239992
+    end_ms: 243032
+  - text: Told you you are a supernova
+    words:
+      - text: "Told "
+        start_ms: 243032
+      - text: "you "
+        start_ms: 243352
+      - text: "you "
+        start_ms: 243662
+      - text: "are "
+        start_ms: 243782
+      - text: "a "
+        start_ms: 243902
+      - text: supernova
+        start_ms: 244062
+    start_ms: 243032
+    end_ms: 245522
+  - text: Baby let me get a closer look at you
+    words:
+      - text: "Baby "
+        start_ms: 245522
+      - text: "let "
+        start_ms: 245872
+      - text: "me "
+        start_ms: 245992
+      - text: "get "
+        start_ms: 246142
+      - text: "a "
+        start_ms: 246302
+      - text: "closer "
+        start_ms: 246452
+      - text: "look "
+        start_ms: 246632
+      - text: "at "
+        start_ms: 247211
+      - text: you
+        start_ms: 247582
+    start_ms: 245522
+    end_ms: 247882
+  - text: "'Cause you shine so bright in my eyes"
+    words:
+      - text: "'Cause "
+        start_ms: 247882
+      - text: "you "
+        start_ms: 248042
+      - text: "shine "
+        start_ms: 248212
+      - text: "so "
+        start_ms: 248592
+      - text: "bright "
+        start_ms: 248922
+      - text: "in "
+        start_ms: 249192
+      - text: "my "
+        start_ms: 249442
+      - text: eyes
+        start_ms: 249922
+    start_ms: 247882
+    end_ms: 250711
+  - text: You can not, you can not, you can not
+    words:
+      - text: "You "
+        start_ms: 251072
+      - text: "can "
+        start_ms: 251232
+      - text: "not, "
+        start_ms: 251502
+      - text: "you "
+        start_ms: 251752
+      - text: "can "
+        start_ms: 251912
+      - text: "not, "
+        start_ms: 252232
+      - text: "you "
+        start_ms: 252392
+      - text: "can "
+        start_ms: 252562
+      - text: not
+        start_ms: 252912
+    start_ms: 251072
+    end_ms: 253391
+  - text: Ooh, shining bright you're a supernova
+    words:
+      - text: "Ooh, "
+        start_ms: 253391
+      - text: "shining "
+        start_ms: 254031
+      - text: "bright "
+        start_ms: 254391
+      - text: "you're "
+        start_ms: 254641
+      - text: "a "
+        start_ms: 254791
+      - text: supernova
+        start_ms: 255121
+    start_ms: 253391
+    end_ms: 256341
+  - text: Still I hold you tight but you're about to explode
+    words:
+      - text: "Still "
+        start_ms: 256341
+      - text: "I "
+        start_ms: 256778
+      - text: "hold "
+        start_ms: 256908
+      - text: "you "
+        start_ms: 257108
+      - text: "tight "
+        start_ms: 257258
+      - text: "but "
+        start_ms: 257458
+      - text: "you're "
+        start_ms: 257658
+      - text: "about "
+        start_ms: 257908
+      - text: "to "
+        start_ms: 258180
+      - text: explode
+        start_ms: 258638
+    start_ms: 256341
+    end_ms: 259501
+  - text: You are, you are, you...
+    words:
+      - text: "You "
+        start_ms: 259501
+      - text: "are, "
+        start_ms: 259821
+      - text: "you "
+        start_ms: 260901
+      - text: "are, "
+        start_ms: 261181
+      - text: you...
+        start_ms: 262371
+    start_ms: 259501
+    end_ms: 264781
+  - text: Said I'd look for you
+    words:
+      - text: "Said "
+        start_ms: 264781
+      - text: "I'd "
+        start_ms: 265271
+      - text: "look "
+        start_ms: 265751
+      - text: "for "
+        start_ms: 266151
+      - text: you
+        start_ms: 266661
+    start_ms: 264781
+    end_ms: 267101
+  - text: In the dark sky
+    words:
+      - text: "In "
+        start_ms: 267101
+      - text: "the "
+        start_ms: 267490
+      - text: "dark "
+        start_ms: 268020
+      - text: sky
+        start_ms: 268540
+    start_ms: 267101
+    end_ms: 269460
+  - text: Somewhere way up high
+    words:
+      - text: "Somewhere "
+        start_ms: 269631
+      - text: "way "
+        start_ms: 270361
+      - text: "up "
+        start_ms: 270841
+      - text: high
+        start_ms: 271321
+    start_ms: 269631
+    end_ms: 271751
+  - text: Is where the stars collide
+    words:
+      - text: "Is "
+        start_ms: 271751
+      - text: "where "
+        start_ms: 272249
+      - text: "the "
+        start_ms: 272759
+      - text: "stars "
+        start_ms: 273159
+      - text: collide
+        start_ms: 273839
+    start_ms: 271751
+    end_ms: 274850
+  - text: Said I'd look for you
+    words:
+      - text: "Said "
+        start_ms: 275091
+      - text: "I'd "
+        start_ms: 275451
+      - text: "look "
+        start_ms: 275851
+      - text: "for "
+        start_ms: 276320
+      - text: you
+        start_ms: 276632
+    start_ms: 275091
+    end_ms: 277221
+  - text: In the dark, dark sky
+    words:
+      - text: "In "
+        start_ms: 277221
+      - text: "the "
+        start_ms: 277701
+      - text: "dark, "
+        start_ms: 278151
+      - text: "dark "
+        start_ms: 278951
+      - text: sky
+        start_ms: 279631
+    start_ms: 277221
+    end_ms: 280400
+  - text: Somewhere way up high
+    words:
+      - text: "Somewhere "
+        start_ms: 280661
+      - text: "way "
+        start_ms: 281691
+      - text: "up "
+        start_ms: 282071
+      - text: high
+        start_ms: 282371
+    start_ms: 280661
+    end_ms: 283461
+  - text: Where the stars collide
+    words:
+      - text: "Where "
+        start_ms: 283461
+      - text: "the "
+        start_ms: 283791
+      - text: "stars "
+        start_ms: 284111
+      - text: collide
+        start_ms: 284821
+    start_ms: 283461
+    end_ms: 286230
+  - text: ""
+    words: []
+    start_ms: 286230
+plain: |-
+  Said I'd look for you
+  In the dark sky
+  Somewhere way up high
+  Like where the stars collide
+
+  And we do
+  Hard to find
+  You're a world apart
+  But still I'm gonna bind to you
+
+  And we move like satellites
+  And we move like satellites
+
+  I'm running to you
+  And I choose
+  To pull you in closer
+  You're the supernova
+
+  I'll choose
+  To run for you
+  Pull you in closer
+  You're the super, you're the supernova
+
+  You're the supernova
+
+  And I'm checking off the list
+  Of the stars that I found
+  And I'm looking out for
+  All the things I never could find
+  Now we are worlds apart
+  I am closer to you
+  Guess I can say I'm round
+
+  Cause we move like satellites
+  You shine so bright
+  'Cause you're the supernova
+
+  And though we're worlds apart
+  You're in my heart
+  I'll pull you in, no, oh
+
+  I'm running to you
+  And I'll choose
+  To pull you in closer
+  You're the supernova
+
+  I'm running for you
+  And I choose
+  To pull you in closer
+  You're the super supernova
+
+  I told you you are a supernova
+  Baby let me get a closer look at you
+  'Cause you shine so bright in my eyes
+  You can not, you can not, you can not
+
+  Ooh, shining bright you're a supernova
+  Still I hold you tight but you're about to explode
+  You are, you are, you are
+
+  I'm running to you
+  And I choose to pull you in closer
+  You're the supernova
+
+  I'm running for you
+  And I choose
+  To pull you in closer
+  You're the super supernova
+
+  Told you you are a supernova
+  Baby let me get a closer look at you
+  'Cause you shine so bright in my eyes
+  You can not, you can not, you can not
+
+  Ooh, shining bright you're a supernova
+  Still I hold you tight but you're about to explode
+  You are, you are, you are
+
+  Said I'd look for you
+  In the dark sky
+  Somewhere way up high
+  Is where the stars collide
+
+  Said I'd look for you
+  In the dark, dark sky
+  Somewhere way up high
+  Where the stars collide

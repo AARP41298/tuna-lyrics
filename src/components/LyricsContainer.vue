@@ -9,6 +9,7 @@ import {LRCLib} from "src/plugins/synced-lyrics/providers/LRCLib";
 import type {LineLyrics, LyricResult} from "src/plugins/synced-lyrics/types";
 import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
+import {Lyricsfile} from "src/plugins/synced-lyrics/parsers/lyricsfile";
 import {applyEmojiProgressColors} from "src/plugins/synced-lyrics/emojiColors";
 import {useHeightStore} from "stores/height";
 import { useRomanizedStore} from "stores/romanized";
@@ -60,7 +61,26 @@ async function fetch_data() {
     ? route.query.lrc[0] ?? ''
     : route.query.lrc ?? ''
 
-  if (lrclibID || jsonName || lrcName) {
+  const yamlName = Array.isArray(route.query.yaml)
+    ? route.query.yaml[0] ?? ''
+    : route.query.yaml ?? ''
+
+  if (yamlName) {
+    const fileName = /\.ya?ml$/i.test(yamlName) ? yamlName : `${yamlName}.yaml`;
+    const response = await fetch(`/yaml/${fileName}`);
+    if (!response.ok) {
+      throw new Error(`Failed to load Lyricsfile /yaml/${fileName} (${response.status})`);
+    }
+
+    const parsed = Lyricsfile.parse(await response.text());
+    const result = Lyricsfile.toLyricResult(parsed);
+    if (result.lines) {
+      result.lines = applyEmojiProgressColors(result.lines);
+    }
+
+    durationMs.value = parsed.metadata.duration_ms ?? Math.round((result.duration ?? 0) * 1000);
+    searchResult.value = result;
+  } else if (lrclibID || jsonName || lrcName) {
     let idData;
     if (lrclibID) {
       idData = await (await fetch(`https://lrclib.net/api/get/${lrclibID}`)).json()
@@ -110,13 +130,6 @@ async function fetch_data() {
       .then(async data => {
         // data now contains the json object with song metadata
 
-        const debugTime = Array.isArray(route.query.debugTime)
-          ? route.query.debugTime[0] ?? ''
-          : route.query.debugTime ?? ''
-        if (debugTime) {
-          currentTime.value = parseInt(debugTime) * 1000
-        }
-
         if (data['title'] != title.value) {
           title.value = data['title'];
           alternativeTitle.value = data['alternativeTitle'];
@@ -160,6 +173,12 @@ async function fetch_data() {
       });
   }
 
+  const debugTime = Array.isArray(route.query.debugTime)
+    ? route.query.debugTime[0] ?? ''
+    : route.query.debugTime ?? ''
+  if (debugTime) {
+    currentTime.value = parseInt(debugTime.toString()) * 1000
+  }
 
   if (searchResult.value) {
     lines.value = searchResult.value.lines
@@ -271,11 +290,21 @@ function waitUntilAllReady(): Promise<void> {
 
 const currentIndex = computed(() => {
   const checkLines = lines.value ?? [];
+  const tNow = currentTime.value;
 
-  return checkLines.findIndex(l => {
-    return currentTime.value >= l.timeInMs &&
-      currentTime.value < l.timeInMs + l.duration
-  })
+  const active = checkLines.findIndex((l) => {
+    return tNow >= l.timeInMs && tNow < l.timeInMs + l.duration;
+  });
+  if (active !== -1) return active;
+
+  // Gaps between end_ms and the next start: stay on the last started line.
+  let lastStarted = -1;
+  for (let i = 0; i < checkLines.length; i++) {
+    const line = checkLines[i];
+    if (!line || line.timeInMs > tNow) break;
+    lastStarted = i;
+  }
+  return lastStarted;
 })
 
 const lineHeights = ref<number[]>([])
