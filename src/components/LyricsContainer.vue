@@ -373,6 +373,7 @@ const centerOffset = heightStore.height / 2
         :is-last="i === lines.length - 1"
         :current="currentTime"
         :durationMs="durationMs"
+        :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
         :artists="searchResult?.artists ?? []"
         :ref="(el)=>setLinesRef(el, i)"
       />

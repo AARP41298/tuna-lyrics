@@ -26,6 +26,8 @@ const props = defineProps<{
   index: number;
   isLast?: boolean;
   artists?: string[];
+  /** Duration of the following line; used to speed up past-line fade during rap. */
+  nextDuration: number;
 }>()
 
 const durationDiv = ref<HTMLDivElement | null>(null);
@@ -56,6 +58,7 @@ const isClosingSilence = computed(
 
 const CLOSING_HOLD_MS = 4000;
 const CLOSING_FADE_MS = 1000;
+const PAST_FADE_MS = 2000;
 
 const cuenta3 = computed(() => {
   const remaining = props.line.timeInMs - props.current
@@ -103,6 +106,19 @@ const opacity = computed(() => {
   }
 
   if (status.value === 'current') return 1;
+
+  if (status.value === 'previous') {
+    const lineEnd = props.line.timeInMs + props.line.duration;
+    const elapsed = props.current - lineEnd;
+    const nextGap = props.nextDuration;
+    const fadeMs = Math.min(
+      PAST_FADE_MS,
+      Number.isFinite(nextGap) && nextGap > 0 ? nextGap : PAST_FADE_MS,
+    );
+    if (elapsed >= fadeMs) return 0;
+    if (elapsed <= 0) return 1;
+    return 1 - elapsed / fadeMs;
+  }
 
   const abs = Math.abs(props.line.timeInMs - props.current);
   const maxDiff = 5000;
