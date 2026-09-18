@@ -28,7 +28,11 @@ const props = defineProps<{
   artists?: string[];
   /** Duration of the following line; used to speed up past-line fade during rap. */
   nextDuration: number;
+  /** Overlapping vocal column; wrap and layout use half the scene. */
+  splitSide?: 'left' | 'right';
 }>()
+
+const isSplitLine = computed(() => props.splitSide === 'left' || props.splitSide === 'right');
 
 const durationDiv = ref<HTMLDivElement | null>(null);
 const refLine = ref<HTMLDivElement | null>(null);
@@ -162,13 +166,381 @@ function wordStartMs(index: number): number {
   return props.line.timeInMs + index * wordDelay;
 }
 
+function wordEndMs(index: number, wordCount: number): number {
+  if (index < wordCount - 1) {
+    return wordStartMs(index + 1);
+  }
+
+  const timed = props.line.words?.[index];
+  if (timed?.duration !== undefined) {
+    return timed.timeInMs + timed.duration;
+  }
+
+  const lineEnd = props.line.timeInMs + props.line.duration;
+  if (Number.isFinite(lineEnd)) {
+    return Math.max(wordStartMs(index) + 80, lineEnd);
+  }
+  return wordStartMs(index) + 400;
+}
+
+type BouncePt = {x: number; y: number};
+type BounceSeg = {
+  from: BouncePt;
+  ctrl: BouncePt;
+  to: BouncePt;
+  startMs: number;
+  endMs: number;
+  samples: BouncePt[];
+  cumLen: number[];
+  length: number;
+};
+
+const bounceHost = ref<HTMLDivElement | null>(null);
+const bounceTracks = ref<
+  {
+    pathD: string;
+    ball: BouncePt | null;
+    totalLen: number;
+    traveled: number;
+    remaining: number;
+    trail: {d: string; opacity: number}[];
+  }[]
+>([]);
+const bounceView = ref({w: 1, h: 1, pad: 0});
+
+const bounceBallR = computed(() => Math.max(5, (heightStore.height / 1080) * 8));
+const bounceMinH = computed(() => (heightStore.height / 1080) * 40);
+const bounceMaxH = computed(() => (heightStore.height / 1080) * 168);
+const hasWordSync = computed(() => (props.line.words?.length ?? 0) > 0);
+const bounceClearanceCss = computed(() => {
+  if (!hasWordSync.value) return '0px';
+  return `${(bounceMaxH.value + bounceBallR.value + 18) * 0.5}px`;
+});
+
+function quadPoint(p0: BouncePt, p1: BouncePt, p2: BouncePt, t: number): BouncePt {
+  const u = 1 - t;
+  return {
+    x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,
+    y: u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y,
+  };
+}
+
+function bounceControl(from: BouncePt, to: BouncePt, height: number): BouncePt {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const chord = Math.hypot(dx, dy);
+  const mid = {x: (from.x + to.x) / 2, y: (from.y + to.y) / 2};
+  if (height <= 0 || chord < 0.001) {
+    return {x: mid.x, y: mid.y - Math.max(0, height)};
+  }
+  let nx = -dy / chord;
+  let ny = dx / chord;
+  if (ny > 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  return {x: mid.x + nx * height, y: mid.y + ny * height};
+}
+
+function sampleQuad(from: BouncePt, ctrl: BouncePt, to: BouncePt, steps = 32) {
+  const samples: BouncePt[] = [from];
+  const cumLen = [0];
+  let length = 0;
+  let prev = from;
+  for (let i = 1; i <= steps; i++) {
+    const point = quadPoint(from, ctrl, to, i / steps);
+    length += Math.hypot(point.x - prev.x, point.y - prev.y);
+    samples.push(point);
+    cumLen.push(length);
+    prev = point;
+  }
+  return {samples, cumLen, length};
+}
+
+function bounceHeightForDuration(durationMs: number): number {
+  const minH = bounceMinH.value;
+  const maxH = bounceMaxH.value;
+  const t = Math.min(1, Math.max(0, (durationMs - 160) / 740));
+  return minH + t * (maxH - minH);
+}
+
+function pointAtLength(samples: BouncePt[], cumLen: number[], dist: number): BouncePt {
+  const last = samples[samples.length - 1];
+  if (!last || samples.length < 2) return last ?? {x: 0, y: 0};
+
+  const total = cumLen[cumLen.length - 1] ?? 0;
+  const d = Math.min(total, Math.max(0, dist));
+  for (let i = 1; i < cumLen.length; i++) {
+    const end = cumLen[i] ?? 0;
+    if (d <= end) {
+      const start = cumLen[i - 1] ?? 0;
+      const span = end - start;
+      const t = span <= 0 ? 1 : (d - start) / span;
+      const a = samples[i - 1];
+      const b = samples[i];
+      if (!a || !b) return last;
+      return {
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t,
+      };
+    }
+  }
+  return last;
+}
+
+function ballOnSegs(segs: BounceSeg[], current: number): BouncePt | null {
+  const first = segs[0];
+  const last = segs[segs.length - 1];
+  if (!first || !last) return null;
+  if (current <= first.startMs) return first.from;
+  if (current >= last.endMs) return last.to;
+
+  for (const seg of segs) {
+    if (current < seg.endMs) {
+      const span = seg.endMs - seg.startMs;
+      const dist =
+        span <= 0
+          ? seg.length
+          : (Math.max(0, current - seg.startMs) / span) * seg.length;
+      return pointAtLength(seg.samples, seg.cumLen, dist);
+    }
+  }
+  return last.to;
+}
+
+const BOUNCE_TRAIL_MS = 480;
+
+function traveledOnSegs(segs: BounceSeg[], current: number): number {
+  const first = segs[0];
+  if (!first) return 0;
+  if (current <= first.startMs) return 0;
+
+  let acc = 0;
+  for (const seg of segs) {
+    if (current >= seg.endMs) {
+      acc += seg.length;
+      continue;
+    }
+    if (current <= seg.startMs) return acc;
+    const span = seg.endMs - seg.startMs;
+    const dist =
+      span <= 0 ? seg.length : ((current - seg.startMs) / span) * seg.length;
+    return acc + dist;
+  }
+  return acc;
+}
+
+function bounceTrail(
+  segs: BounceSeg[],
+  current: number,
+): {d: string; opacity: number}[] {
+  const trail: {d: string; opacity: number}[] = [];
+  let prev: BouncePt | null = null;
+  let prevAge = 0;
+
+  for (const seg of segs) {
+    const span = Math.max(0, seg.endMs - seg.startMs);
+    for (let i = 0; i < seg.samples.length; i++) {
+      const pt = seg.samples[i];
+      if (!pt) continue;
+      const len = seg.cumLen[i] ?? 0;
+      const t = seg.length <= 0 ? 1 : len / seg.length;
+      const age = current - (seg.startMs + t * span);
+      if (
+        prev &&
+        prevAge > 0 &&
+        age > 0 &&
+        Math.hypot(pt.x - prev.x, pt.y - prev.y) > 0.4
+      ) {
+        const opacity = 1 - (prevAge + age) / 2 / BOUNCE_TRAIL_MS;
+        if (opacity > 0.03) {
+          trail.push({
+            d: `M ${prev.x} ${prev.y} L ${pt.x} ${pt.y}`,
+            opacity,
+          });
+        }
+      }
+      prev = pt;
+      prevAge = age;
+    }
+  }
+  return trail;
+}
+
+function segsFromHops(
+  hops: {from: BouncePt; to: BouncePt; startMs: number; endMs: number}[],
+): BounceSeg[] {
+  return hops.map((hop) => {
+    const height = bounceHeightForDuration(hop.endMs - hop.startMs);
+    const ctrl = bounceControl(hop.from, hop.to, height);
+    const sampled = sampleQuad(hop.from, ctrl, hop.to);
+    return {
+      from: hop.from,
+      to: hop.to,
+      ctrl,
+      startMs: hop.startMs,
+      endMs: hop.endMs,
+      samples: sampled.samples,
+      cumLen: sampled.cumLen,
+      length: sampled.length,
+    };
+  });
+}
+
+function pathFromSegs(segs: BounceSeg[]): string {
+  return segs
+    .map((seg, i) => {
+      const start = i === 0 ? `M ${seg.from.x} ${seg.from.y}` : '';
+      return `${start} Q ${seg.ctrl.x} ${seg.ctrl.y} ${seg.to.x} ${seg.to.y}`;
+    })
+    .join(' ');
+}
+
+function updateBounce(current: number) {
+  const host = bounceHost.value;
+  if (
+    !host ||
+    !hasWordSync.value ||
+    isClosingSilence.value ||
+    isLeadingSilence.value ||
+    !props.line.text.trim() ||
+    opacity.value <= 0.02
+  ) {
+    bounceTracks.value = [];
+    return;
+  }
+
+  const timedEls: {el: HTMLElement; index: number}[] = [];
+  wordRefs.value.forEach((el, index) => {
+    if (el) timedEls.push({el, index});
+  });
+  if (timedEls.length === 0) {
+    bounceTracks.value = [];
+    return;
+  }
+
+  const hostRect = host.getBoundingClientRect();
+  const r = bounceBallR.value;
+  const wrapBreaks = new Set(kanjiBreakBefore.value);
+
+  const boxOf = (el: HTMLElement) => {
+    const rect = el.getBoundingClientRect();
+    return {
+      left: rect.left - hostRect.left,
+      right: rect.right - hostRect.left,
+      y: rect.top - hostRect.top,
+    };
+  };
+
+  const rows: {el: HTMLElement; index: number; box: ReturnType<typeof boxOf>}[][] = [];
+  for (const item of timedEls) {
+    const box = boxOf(item.el);
+    const lastRow = rows[rows.length - 1];
+    const startNewRow =
+      wrapBreaks.has(item.index) ||
+      (lastRow?.[0] !== undefined && Math.abs(box.y - lastRow[0].box.y) > 10);
+    if (startNewRow || !lastRow) {
+      rows.push([{...item, box}]);
+    } else {
+      lastRow.push({...item, box});
+    }
+  }
+
+  const lastIndex = timedEls[timedEls.length - 1]?.index ?? 0;
+  const rowSegs: BounceSeg[][] = [];
+  let minY = 0;
+
+  for (const row of rows) {
+    const hops: {from: BouncePt; to: BouncePt; startMs: number; endMs: number}[] = [];
+    for (let i = 0; i < row.length; i++) {
+      const word = row[i];
+      if (!word) continue;
+      const from = {x: word.box.left + r, y: word.box.y};
+      const next = row[i + 1];
+      const to = next
+        ? {x: next.box.left + r, y: next.box.y}
+        : {x: Math.max(from.x + 10, word.box.right - r), y: word.box.y};
+      const startMs = wordStartMs(word.index);
+      const endMs = Math.max(startMs + 40, wordEndMs(word.index, lastIndex + 1));
+      hops.push({from, to, startMs, endMs});
+    }
+    const segs = segsFromHops(hops);
+    for (const seg of segs) {
+      minY = Math.min(minY, seg.from.y, seg.to.y, seg.ctrl.y);
+    }
+    if (segs.length) rowSegs.push(segs);
+  }
+
+  if (rowSegs.length === 0) {
+    bounceTracks.value = [];
+    return;
+  }
+
+  const pad = Math.max(24, bounceBallR.value + 8 - minY);
+  const shift = (pt: BouncePt): BouncePt => ({x: pt.x, y: pt.y + pad});
+  for (const segs of rowSegs) {
+    for (const seg of segs) {
+      seg.from = shift(seg.from);
+      seg.to = shift(seg.to);
+      seg.ctrl = shift(seg.ctrl);
+      seg.samples = seg.samples.map(shift);
+    }
+  }
+
+  bounceView.value = {
+    w: Math.max(1, hostRect.width),
+    h: Math.max(1, hostRect.height + pad),
+    pad,
+  };
+  bounceTracks.value = rowSegs.map((segs) => {
+    const totalLen = segs.reduce((sum, seg) => sum + seg.length, 0);
+    const traveled = Math.min(totalLen, Math.max(0, traveledOnSegs(segs, current)));
+    return {
+      pathD: pathFromSegs(segs),
+      ball: ballOnSegs(segs, current),
+      totalLen: Math.max(0.001, totalLen),
+      traveled,
+      remaining: Math.max(0, totalLen - traveled),
+      trail: bounceTrail(segs, current),
+    };
+  });
+}
+
+const bounceLaidOut = ref(false);
+
+const showBounce = computed(
+  () =>
+    hasWordSync.value &&
+    bounceLaidOut.value &&
+    bounceTracks.value.length > 0,
+);
+
 const smallKanji = route.query.smallKanji ?? false
 const romanizedStore = useRomanizedStore()
 
+let romWorkDone = false
+let mountedLayoutDone = false
+let signaledReady = false
+
+function signalLineReady() {
+  if (signaledReady || !romWorkDone || !mountedLayoutDone) return
+  signaledReady = true
+  romanizedStore.lineReady()
+}
+
+async function finishBounceLayout() {
+  applySpecialFonts(wordRefs.value)
+  applySpecialFonts(romanjiRefs.value)
+  await nextTick()
+  lockWraps()
+  await nextTick()
+  bounceLaidOut.value = true
+  updateBounce(props.current)
+}
+
 watch(
   () => props.current,
-  (current) => {
-
+  async (current) => {
     romanizedStore.extraPlus()
     wordRefs.value.forEach((el, index) => {
       romanizedStore.extraPlus()
@@ -181,6 +553,10 @@ watch(
       popWord(el, index, current)
       romanizedStore.extraReady()
     });
+    if (bounceLaidOut.value) {
+      await nextTick()
+      updateBounce(current)
+    }
     romanizedStore.extraReady()
   },
   {immediate: true}
@@ -217,6 +593,14 @@ function popWord(el: HTMLElement | null, index: number, current: number, small: 
 }
 
 function getMeasureWidth(): number {
+  if (isSplitLine.value) {
+    const column = refLine.value?.clientWidth;
+    if (column && column > 0) return column;
+
+    const scene = document.getElementById('scene');
+    if (scene && scene.clientWidth > 0) return Math.floor(scene.clientWidth / 2);
+  }
+
   const scene = document.getElementById('scene');
   if (scene && scene.clientWidth > 0) return scene.clientWidth;
 
@@ -369,9 +753,9 @@ function applySpecialFonts(els: (HTMLElement | null)[]) {
 }
 
 onMounted(async () => {
-  applySpecialFonts(wordRefs.value)
-  await nextTick()
-  lockWraps()
+  await finishBounceLayout()
+  mountedLayoutDone = true
+  signalLineReady()
 })
 
 
@@ -409,7 +793,8 @@ const showRomanji = ref(false);
 const small = ref('')
 onBeforeMount(async () => {
   if (isLeadingSilence.value) {
-    romanizedStore.lineReady()
+    romWorkDone = true
+    signalLineReady()
     return
   }
 
@@ -418,12 +803,9 @@ onBeforeMount(async () => {
     onlyFurigana = text.value
     romanization.value = 'Thanks for watching'
     showRomanji.value = true
-    await nextTick()
-    applySpecialFonts(wordRefs.value)
-    applySpecialFonts(romanjiRefs.value)
-    await nextTick()
-    lockWraps()
-    romanizedStore.lineReady()
+    await finishBounceLayout()
+    romWorkDone = true
+    signalLineReady()
     return
   }
 
@@ -445,12 +827,9 @@ onBeforeMount(async () => {
     small.value = 'small'
   }
 
-  await nextTick()
-  applySpecialFonts(wordRefs.value)
-  applySpecialFonts(romanjiRefs.value)
-  await nextTick()
-  lockWraps()
-  romanizedStore.lineReady()
+  await finishBounceLayout()
+  romWorkDone = true
+  signalLineReady()
 })
 
 
@@ -476,8 +855,9 @@ const progressStyle = computed(() => ({
 <template>
   <div
     ref="refLine"
-    class="col-12"
     :class="{
+      'col-12': !isSplitLine,
+      'lyric-split-line': isSplitLine,
       'leading-silence': isLeadingSilence,
     }"
     :style="{ opacity: isLeadingSilence ? 0 : opacity }"
@@ -503,6 +883,62 @@ const progressStyle = computed(() => ({
           ref="durationDiv"
         >
 
+          <div class="lyric-bounce-host" ref="bounceHost">
+            <svg
+              v-if="showBounce"
+              class="lyric-bounce-svg"
+              :viewBox="`0 0 ${bounceView.w} ${bounceView.h}`"
+              :style="{ top: -bounceView.pad + 'px', height: bounceView.h + 'px' }"
+              aria-hidden="true"
+            >
+              <g v-for="(track, trackIndex) in bounceTracks" :key="trackIndex">
+                <path
+                  v-if="track.remaining > 2"
+                  class="lyric-bounce-path-outline lyric-bounce-path-ahead"
+                  :d="track.pathD"
+                  :pathLength="track.totalLen"
+                  :stroke-dasharray="`${track.remaining} ${track.totalLen}`"
+                  :stroke-dashoffset="-track.traveled"
+                />
+                <path
+                  v-if="track.remaining > 2"
+                  class="lyric-bounce-path lyric-bounce-path-ahead"
+                  :d="track.pathD"
+                  :stroke="progressColor"
+                  :pathLength="track.totalLen"
+                  :stroke-dasharray="`${track.remaining} ${track.totalLen}`"
+                  :stroke-dashoffset="-track.traveled"
+                />
+                <g v-for="(piece, pieceIndex) in track.trail" :key="'t-'+pieceIndex">
+                  <path
+                    class="lyric-bounce-path-outline"
+                    :d="piece.d"
+                    :opacity="piece.opacity"
+                  />
+                  <path
+                    class="lyric-bounce-path"
+                    :d="piece.d"
+                    :stroke="progressColor"
+                    :opacity="piece.opacity"
+                  />
+                </g>
+                <circle
+                  v-if="track.ball"
+                  class="lyric-bounce-ball-outline"
+                  :cx="track.ball.x"
+                  :cy="track.ball.y"
+                  :r="bounceBallR + 2"
+                />
+                <circle
+                  v-if="track.ball"
+                  class="lyric-bounce-ball"
+                  :cx="track.ball.x"
+                  :cy="track.ball.y"
+                  :r="bounceBallR"
+                  :fill="progressColor"
+                />
+              </g>
+            </svg>
           <div ref="kanjiRow" class="row justify-center items-center">
             <!--              color="teal"-->
             <q-circular-progress
@@ -538,6 +974,7 @@ const progressStyle = computed(() => ({
               src="/icons/flag-mexico.png"
               alt="🇲🇽"
             >
+          </div>
           </div>
 
           <!--        TODO: config()?.romanization-->
@@ -596,6 +1033,10 @@ const progressStyle = computed(() => ({
   stroke: var(--progress-track-color, #e0e0e0);
 }
 
+.lyric-split-line {
+  width: 100%;
+}
+
 .leading-silence {
   height: 0;
   overflow: hidden;
@@ -604,11 +1045,56 @@ const progressStyle = computed(() => ({
 
 .text-lyrics {
   position: relative;
+  line-height: 1.45;
+}
+
+.lyric-bounce-host {
+  position: relative;
+  width: 100%;
+  padding-top: v-bind(bounceClearanceCss);
+}
+
+.lyric-bounce-svg {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 4;
+  text-shadow: none;
+}
+
+.lyric-bounce-path-outline {
+  fill: none;
+  stroke: #000;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lyric-bounce-path {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lyric-bounce-path-ahead {
+  stroke-linecap: butt;
+}
+
+.lyric-bounce-ball-outline {
+  fill: #000;
+}
+
+.lyric-bounce-ball {
+  stroke: #000;
+  stroke-width: 1.5;
 }
 
 .lyric-line-break {
   flex-basis: 100%;
-  height: 0;
+  height: v-bind(bounceClearanceCss);
   overflow: hidden;
   margin: 0;
   padding: 0;

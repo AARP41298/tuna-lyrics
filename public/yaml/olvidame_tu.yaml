@@ -1,0 +1,313 @@
+version: "1.0"
+metadata:
+  title: Olvídame tú (with Marco Antonio Solís) [MTV Unplugged]
+  artist: Miguel Bose
+  instrumental: false
+  album: MTV Unplugged
+  duration_ms: 279360
+lines:
+  - text: 👨‍🎤Todas nuestras tardes son
+    words: []
+    start_ms: 14851
+    end_ms: 18520
+  - text: ...Bajo estrellas escondidas
+    words: []
+    start_ms: 18520
+    end_ms: 22020
+  - text: Luces que mi corazón
+    words: []
+    start_ms: 22020
+    end_ms: 24940
+  - text: Se pensaría
+    words: []
+    start_ms: 24940
+    end_ms: 26980
+  - text: ""
+    words: []
+    start_ms: 26980
+    end_ms: 29650
+  - text: 🎙️...Desnudarme como soy
+    words: []
+    start_ms: 29650
+    end_ms: 33200
+  - text: Siendo así como la arena
+    words: []
+    start_ms: 33200
+    end_ms: 37080
+  - text: Que resbale en tu querer
+    words: []
+    start_ms: 37080
+    end_ms: 39620
+  - text: Por dónde pueda
+    words: []
+    start_ms: 39620
+    end_ms: 42500
+  - text: ""
+    words: []
+    start_ms: 42500
+    end_ms: 44500
+  - text: 👨‍🎤...Darte para retenerte
+    words: []
+    start_ms: 44500
+    end_ms: 48170
+  - text: ...Recelar sino me miras
+    words: []
+    start_ms: 48170
+    end_ms: 51380
+  - text: 🎙️Con tus ojos tu boca
+    words: []
+    start_ms: 51380
+    end_ms: 53550
+  - text: Tu savia que es mía, 👨‍🎤🎙️mía
+    words: []
+    start_ms: 53550
+    end_ms: 59020
+  - text: 👨‍🎤Responde a mi nombre, si te lo susurran
+    words: []
+    start_ms: 59020
+    end_ms: 62690
+  - text: 🎙️Arranca de todo mi piel que es tan tuya
+    words: []
+    start_ms: 62764
+    end_ms: 66551
+  - text: 👨‍🎤🎙️Que arda mi cuerpo, si no estás conmigo, amor
+    words: []
+    start_ms: 66551
+    end_ms: 72910
+  - text: Olvídame tú que yo no puedo
+    words: []
+    start_ms: 72910
+    end_ms: 80290
+  - text: No voy a entender el amor
+    words: []
+    start_ms: 80290
+    end_ms: 84540
+  - text: Sin ti
+    words: []
+    start_ms: 84540
+    end_ms: 86590
+  - text: ""
+    words: []
+    start_ms: 86590
+    end_ms: 87710
+  - text: Olvídame tú, que yo, no puedo
+    words: []
+    start_ms: 87710
+    end_ms: 94090
+  - text: Dejar de quererte
+    words: []
+    start_ms: 94090
+    end_ms: 99390
+  - text: Por mucho que lo intente
+    words: []
+    start_ms: 99390
+    end_ms: 103520
+  - text: No puedo, amor
+    words: []
+    start_ms: 103520
+    end_ms: 106310
+  - text: Olvídame tú
+    words: []
+    start_ms: 106310
+    end_ms: 110740
+  - text: ""
+    words: []
+    start_ms: 110740
+    end_ms: 114860
+  - text: 🎙️Qué bonito cuando el sol
+    words: []
+    start_ms: 114860
+    end_ms: 118620
+  - text: ...Derramó sobre nosotros
+    words: []
+    start_ms: 118620
+    end_ms: 122330
+  - text: Esa luz que se apagó
+    words: []
+    start_ms: 122330
+    end_ms: 124710
+  - text: Y que se perdía
+    words: []
+    start_ms: 124710
+    end_ms: 128000
+  - text: ""
+    words: []
+    start_ms: 128000
+    end_ms: 129630
+  - text: 👨‍🎤Si tú quieres, quiero yo
+    words: []
+    start_ms: 129630
+    end_ms: 133420
+  - text: Palpitar de otra manera
+    words: []
+    start_ms: 133420
+    end_ms: 137050
+  - text: ...Que nos lleve sin timón
+    words: []
+    start_ms: 137050
+    end_ms: 139850
+  - text: Lo que nos queda
+    words: []
+    start_ms: 139850
+    end_ms: 144440
+  - text: Sentiremos tal vez frío
+    words: []
+    start_ms: 144440
+    end_ms: 148110
+  - text: Si no existe poesía
+    words: []
+    start_ms: 148110
+    end_ms: 151360
+  - text: En tus ojos, tu boca, tu savia que es mía, mía
+    words: []
+    start_ms: 151360
+    end_ms: 159160
+  - text: 🎙️Y el tiempo nos pasa casi inadvertido
+    words: []
+    start_ms: 159160
+    end_ms: 162790
+  - text: Golpea con fuerza lo tuyo y lo mío
+    words: []
+    start_ms: 162790
+    end_ms: 166460
+  - text: 👨‍🎤🎙️Qué pena ignorarlo y dejarlo perdido, amor
+    words: []
+    start_ms: 166460
+    end_ms: 172973
+  - text: Olvídame tú que yo, no puedo
+    words: []
+    start_ms: 172973
+    end_ms: 180390
+  - text: No voy a entender el amor, sin ti
+    words: []
+    start_ms: 180390
+    end_ms: 187770
+  - text: Olvídame tú, que yo, no puedo
+    words: []
+    start_ms: 187770
+    end_ms: 194110
+  - text: Dejar de quererte
+    words: []
+    start_ms: 194110
+    end_ms: 197820
+  - text: ""
+    words: []
+    start_ms: 197820
+    end_ms: 199450
+  - text: Por mucho que lo intente
+    words: []
+    start_ms: 199450
+    end_ms: 203490
+  - text: No puedo, amor
+    words: []
+    start_ms: 203490
+    end_ms: 206330
+  - text: Olvídame tú
+    words: []
+    start_ms: 206330
+    end_ms: 210540
+  - text: ""
+    words: []
+    start_ms: 210540
+    end_ms: 221092
+  - text: Olvídame tú, que yo
+    words: []
+    start_ms: 221092
+    end_ms: 225560
+  - text: No puedo
+    words: []
+    start_ms: 225560
+    end_ms: 228560
+  - text: No voy a entender el amor
+    words: []
+    start_ms: 228560
+    end_ms: 232820
+  - text: Sin ti
+    words: []
+    start_ms: 232820
+    end_ms: 235940
+  - text: Y olvídame tú, que yo, no puedo
+    words: []
+    start_ms: 235940
+    end_ms: 242490
+  - text: Dejar de quererte
+    words: []
+    start_ms: 242490
+    end_ms: 245740
+  - text: ""
+    words: []
+    start_ms: 245740
+    end_ms: 248040
+  - text: Por mucho que lo intente
+    words: []
+    start_ms: 248040
+    end_ms: 251710
+  - text: No puedo, amor
+    words: []
+    start_ms: 251710
+    end_ms: 253210
+  - text: ""
+    words: []
+    start_ms: 253210
+    end_ms: 258130
+  - text: Olvídame tú
+    words: []
+    start_ms: 258130
+    end_ms: 264010
+  - text: ""
+    words: []
+    start_ms: 264010
+plain: |
+  👨‍🎤Todas nuestras tardes son
+  ...Bajo estrellas escondidas
+  Luces que mi corazón
+  Se pensaría
+  🎙️...Desnudarme como soy
+  Siendo así como la arena
+  Que resbale en tu querer
+  Por dónde pueda
+  👨‍🎤...Darte para retenerte
+  ...Recelar sino me miras
+  🎙️Con tus ojos tu boca
+  Tu savia que es mía, 👨‍🎤🎙️mía
+  👨‍🎤Responde a mi nombre, si te lo susurran
+  🎙️Arranca de todo mi piel que es tan tuya
+  👨‍🎤🎙️Que arda mi cuerpo, si no estás conmigo, amor
+  Olvídame tú que yo no puedo
+  No voy a entender el amor
+  Sin ti
+  Olvídame tú, que yo, no puedo
+  Dejar de quererte
+  Por mucho que lo intente
+  No puedo, amor
+  Olvídame tú
+  🎙️Qué bonito cuando el sol
+  ...Derramó sobre nosotros
+  Esa luz que se apagó
+  Y que se perdía
+  👨‍🎤Si tú quieres, quiero yo
+  Palpitar de otra manera
+  ...Que nos lleve sin timón
+  Lo que nos queda
+  Sentiremos tal vez frío
+  Si no existe poesía
+  En tus ojos, tu boca, tu savia que es mía, mía
+  🎙️Y el tiempo nos pasa casi inadvertido
+  Golpea con fuerza lo tuyo y lo mío
+  👨‍🎤🎙️Qué pena ignorarlo y dejarlo perdido, amor
+  Olvídame tú que yo, no puedo
+  No voy a entender el amor, sin ti
+  Olvídame tú, que yo, no puedo
+  Dejar de quererte
+  Por mucho que lo intente
+  No puedo, amor
+  Olvídame tú
+  Olvídame tú, que yo
+  No puedo
+  No voy a entender el amor
+  Sin ti
+  Y olvídame tú, que yo, no puedo
+  Dejar de quererte
+  Por mucho que lo intente
+  No puedo, amor
+  Olvídame tú

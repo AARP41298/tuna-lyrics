@@ -6,7 +6,7 @@ export type EmojiProgressColor = {
 };
 
 /** Default arc color when no emoji has been seen yet */
-export const DEFAULT_PROGRESS_COLOR = '#00ff00';
+export const DEFAULT_PROGRESS_COLOR = '#fd04fd';
 
 /** Default track when no override is set (Quasar grey-3-ish) */
 export const DEFAULT_PROGRESS_TRACK_COLOR = '#e0e0e0';
@@ -42,15 +42,27 @@ export const EMOJI_PROGRESS_COLORS: Record<string, EmojiProgressColor> = {
   '🗿': {color: '#795548'},
   '👨': {color: '#42a5f5'},
   '🎤': {color: '#ab47bc'},
-  '🎙': {color: '#7e57c2'},
+  // '🎙': {color: '#b5aebc'},
+  '🎙': {color: '#601824'}, //saco rojo marco antonio
   '🪶': {color: '#a1887f'},
   '🕺': {color: '#26a69a'},
   '💃': {color: '#ef5350'},
+  '👨‍🎤': {color: '#009af2'},
 };
 
 function stripVariationSelectors(text: string): string {
   return text.replace(/\uFE0F/g, '');
 }
+
+/** Keys without U+FE0F; later map entries win when two keys normalize the same. */
+const NORMALIZED_EMOJI_COLORS: Record<string, EmojiProgressColor> = {};
+for (const [key, value] of Object.entries(EMOJI_PROGRESS_COLORS)) {
+  NORMALIZED_EMOJI_COLORS[stripVariationSelectors(key)] = value;
+}
+
+const NORMALIZED_EMOJI_KEYS = Object.keys(NORMALIZED_EMOJI_COLORS).sort(
+  (a, b) => b.length - a.length,
+);
 
 /** Drop parenthetical annotations so emojis inside them do not change color. */
 function textOutsideParentheses(text: string): string {
@@ -75,24 +87,29 @@ export function findLastProgressEmoji(text: string): string | null {
   const haystack = stripVariationSelectors(textOutsideParentheses(text));
   if (!haystack) return null;
 
+  const taken: {start: number; end: number}[] = [];
   let bestIndex = -1;
   let bestKey: string | null = null;
 
-  for (const key of Object.keys(EMOJI_PROGRESS_COLORS)) {
-    const needle = stripVariationSelectors(key);
+  for (const needle of NORMALIZED_EMOJI_KEYS) {
     let from = 0;
     let idx: number;
     while ((idx = haystack.indexOf(needle, from)) !== -1) {
-      if (
-        idx > bestIndex ||
-        (idx === bestIndex &&
-          bestKey !== null &&
-          needle.length > stripVariationSelectors(bestKey).length)
-      ) {
-        bestIndex = idx;
-        bestKey = key;
+      const end = idx + needle.length;
+      const overlaps = taken.some((range) => idx < range.end && end > range.start);
+      if (!overlaps) {
+        taken.push({start: idx, end});
+        if (
+          idx > bestIndex ||
+          (idx === bestIndex &&
+            bestKey !== null &&
+            needle.length > bestKey.length)
+        ) {
+          bestIndex = idx;
+          bestKey = needle;
+        }
       }
-      from = idx + needle.length;
+      from = idx + Math.max(1, needle.length);
     }
   }
 
@@ -106,7 +123,7 @@ export type ProgressColorState = {
 
 function colorFromEmoji(emoji: string | null): ProgressColorState | null {
   if (!emoji) return null;
-  const entry = EMOJI_PROGRESS_COLORS[emoji];
+  const entry = NORMALIZED_EMOJI_COLORS[stripVariationSelectors(emoji)];
   if (!entry) return null;
   return {
     progressColor: entry.color,

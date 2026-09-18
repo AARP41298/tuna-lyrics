@@ -11,6 +11,11 @@ import {useRoute} from "vue-router";
 import {LRC} from "src/plugins/synced-lyrics/parsers/lrc";
 import {Lyricsfile} from "src/plugins/synced-lyrics/parsers/lyricsfile";
 import {applyEmojiProgressColors} from "src/plugins/synced-lyrics/emojiColors";
+import {
+  blockIndices,
+  blockStartMs,
+  buildLyricBlocks,
+} from "src/plugins/synced-lyrics/layout/blocks";
 import {useHeightStore} from "stores/height";
 import { useRomanizedStore} from "stores/romanized";
 
@@ -274,110 +279,105 @@ async function seekToFrame(frame: number) {
 function waitUntilAllReady(): Promise<void> {
   const romanizedStore = useRomanizedStore()
   return new Promise((resolve) => {
-    if (romanizedStore.completedRom&&romanizedStore.completedExtra) return resolve()
+    const isReady = () =>
+      romanizedStore.completedRom && romanizedStore.completedExtra
+
+    if (isReady()) return resolve()
 
     const stop = watch(
-      () => romanizedStore.completedRom,
-      (ready) => {
-        if (ready) {
+      () => [romanizedStore.completedRom, romanizedStore.completedExtra],
+      () => {
+        if (isReady()) {
           stop()
           resolve()
         }
-      }
+      },
     )
   })
 }
 
-const currentIndex = computed(() => {
+const heightStore = useHeightStore();
+const centerOffset = heightStore.height / 2
+
+/** Consecutive lines whose times overlap render as a left/right split. */
+const lyricBlocks = computed(() => buildLyricBlocks(lines.value ?? []))
+
+const currentBlockIndex = computed(() => {
   const checkLines = lines.value ?? [];
+  const blocks = lyricBlocks.value;
   const tNow = currentTime.value;
 
-  const active = checkLines.findIndex((l) => {
-    return tNow >= l.timeInMs && tNow < l.timeInMs + l.duration;
-  });
+  const active = blocks.findIndex((block) =>
+    blockIndices(block).some((index) => {
+      const line = checkLines[index];
+      return !!line && tNow >= line.timeInMs && tNow < line.timeInMs + line.duration;
+    }),
+  );
   if (active !== -1) return active;
 
-  // Gaps between end_ms and the next start: stay on the last started line.
   let lastStarted = -1;
-  for (let i = 0; i < checkLines.length; i++) {
-    const line = checkLines[i];
-    if (!line || line.timeInMs > tNow) break;
-    lastStarted = i;
+  for (let b = 0; b < blocks.length; b++) {
+    const block = blocks[b];
+    if (!block) continue;
+    if (blockStartMs(block, checkLines) > tNow) break;
+    lastStarted = b;
   }
   return lastStarted;
 })
 
-const lineHeights = ref<number[]>([])
-const lineRefs = ref<(InstanceType<typeof SyncedLine> | null)[]>([])
+const blockHeights = ref<number[]>([])
+const blockEls = ref<(HTMLElement | null)[]>([])
 
-const setLinesRef = (el: unknown, index: number) => {
-  lineRefs.value[index] = el as InstanceType<typeof SyncedLine>
+const setBlockRef = (el: unknown, index: number) => {
+  blockEls.value[index] = el instanceof HTMLElement ? el : null
 }
 
 function updateLineHeights() {
-  lineHeights.value = lineRefs.value.map(lRef => lRef?.$el.offsetHeight || 0)
+  blockHeights.value = lyricBlocks.value.map((_, index) => blockEls.value[index]?.offsetHeight || 0)
 }
 
-
-const offsetY = computed(() => {
-  const idx = currentIndex.value
-  const prevHeights = lineHeights.value.slice(0, idx)
-  const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
-  const currentHeight = lineHeights.value[idx] || 0
-  return centerOffset - (sumPrev + currentHeight / 2)
+watch(lyricBlocks, async () => {
+  await nextTick()
+  updateLineHeights()
 })
 
+function offsetForBlock(idx: number): number {
+  const prevHeights = blockHeights.value.slice(0, idx)
+  const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
+  const currentHeight = blockHeights.value[idx] || 0
+  return centerOffset - (sumPrev + currentHeight / 2)
+}
+
+const offsetY = computed(() => offsetForBlock(currentBlockIndex.value))
+
 const offsetYAnimated = computed(() => {
-  const idx = currentIndex.value
-  if (idx < 0) return offsetY.value
+  const idx = currentBlockIndex.value
+  const checkLines = lines.value
+  if (idx < 0 || !checkLines) return offsetY.value
 
-  // Tiempo de inicio y fin de la animación
-  if (!lines.value) return offsetY.value
-  const nextLine = lines.value[idx + 1]
-  if (!nextLine) return offsetY.value
+  const nextBlock = lyricBlocks.value[idx + 1]
+  if (!nextBlock) return offsetY.value
 
-  const animStart = nextLine.timeInMs - 200 // 0.2s antes
-  const animEnd = nextLine.timeInMs + 200   // 0.2s después
+  const nextStart = blockStartMs(nextBlock, checkLines)
+  const animStart = nextStart - 200
+  const animEnd = nextStart + 200
   const tNow = currentTime.value
 
-  // Si estamos fuera del rango, usar posición fija
   if (tNow <= animStart) return offsetY.value
-  if (tNow >= animEnd) {
-    // Ya pasamos a la siguiente línea, usar offset de la nueva
-    const idxNext = idx + 1
-    const prevHeights = lineHeights.value.slice(0, idxNext)
-    const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
-    const currentHeight = lineHeights.value[idxNext] || 0
-    return centerOffset - (sumPrev + currentHeight / 2)
-  }
+  if (tNow >= animEnd) return offsetForBlock(idx + 1)
 
-  // Normalizar el progreso entre 0 y 1
   const progress = (tNow - animStart) / (animEnd - animStart)
-
-  // Easing cuadrático: suave → rápido → suave
   const ease = progress < 0.5
     ? 2 * progress * progress
     : -1 + (4 - 2 * progress) * progress
 
-  // Calcular offset inicial y final
-  const startOffset = offsetY.value
-  const idxNext = idx + 1
-  const prevHeightsNext = lineHeights.value.slice(0, idxNext)
-  const sumPrevNext = prevHeightsNext.reduce((a, b) => a + b, 0)
-  const nextOffset = centerOffset - (sumPrevNext + (lineHeights.value[idxNext] || 0) / 2)
-
-  // Interpolar suavemente
-  return startOffset + (nextOffset - startOffset) * ease
+  return offsetY.value + (offsetForBlock(idx + 1) - offsetY.value) * ease
 })
-
-const heightStore = useHeightStore();
-
-const centerOffset = heightStore.height / 2
 </script>
 
 <template>
   <div
-    class="lyric-container row justify-center"
+    class="lyric-container"
     :style="{
         transform: `translateY(${offsetYAnimated}px)`}">
     <LoadingKaomoji v-if="fetching==='fetching'"/>
@@ -390,25 +390,93 @@ const centerOffset = heightStore.height / 2
       ＼(〇_ｏ)／
     </div>
 
-    <div v-else-if="lines" class="col-12">
-      <!--      <span style="font-size: 3rem; color: white; float: left">
-            {{ rFrame }} - {{ currentTime }}
-            </span>-->
-
-      <SyncedLine
-        v-for="(l, i) in lines" :key="i"
-        :line="l"
-        :index="i"
-        :is-last="i === lines.length - 1"
-        :current="currentTime"
-        :durationMs="durationMs"
-        :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
-        :artists="searchResult?.artists ?? []"
-        :ref="(el)=>setLinesRef(el, i)"
-      />
+    <div v-else-if="lines" class="lyric-blocks">
+      <div
+        v-for="(block, b) in lyricBlocks"
+        :key="'block-'+b"
+        class="lyric-block"
+        :class="{ 'lyric-split': block.kind === 'split' }"
+        :ref="(el) => setBlockRef(el, b)"
+      >
+        <template v-if="block.kind === 'split'">
+          <div class="lyric-split-pane lyric-split-left">
+            <SyncedLine
+              v-for="i in block.left"
+              :key="'L'+i"
+              :line="lines[i]!"
+              :index="i"
+              :is-last="i === lines.length - 1"
+              :current="currentTime"
+              :durationMs="durationMs"
+              :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
+              :artists="searchResult?.artists ?? []"
+              split-side="left"
+            />
+          </div>
+          <div class="lyric-split-pane lyric-split-right">
+            <SyncedLine
+              v-for="i in block.right"
+              :key="'R'+i"
+              :line="lines[i]!"
+              :index="i"
+              :is-last="i === lines.length - 1"
+              :current="currentTime"
+              :durationMs="durationMs"
+              :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
+              :artists="searchResult?.artists ?? []"
+              split-side="right"
+            />
+          </div>
+        </template>
+        <SyncedLine
+          v-else
+          :line="lines[block.indices[0]]!"
+          :index="block.indices[0]"
+          :is-last="block.indices[0] === lines.length - 1"
+          :current="currentTime"
+          :durationMs="durationMs"
+          :next-duration="lines[block.indices[0] + 1]?.duration ?? Number.POSITIVE_INFINITY"
+          :artists="searchResult?.artists ?? []"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.lyric-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.lyric-blocks {
+  width: 100%;
+}
+
+.lyric-block {
+  width: 100%;
+}
+
+.lyric-split {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.lyric-split-pane {
+  flex: 1 1 50%;
+  min-width: 0;
+  max-width: 50%;
+}
+
+.lyric-split-left {
+  padding-right: 1.2vw;
+}
+
+.lyric-split-right {
+  padding-left: 1.2vw;
+}
 </style>
