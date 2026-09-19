@@ -1,0 +1,239 @@
+version: "1.0"
+metadata:
+  title: Te Lo Pido Por Favor
+  artist: Juan Gabriel, Luis Fonsi
+  instrumental: false
+  album: Los Dúo
+  duration_ms: 243000
+lines:
+  - text: 🎩 Donde estés hoy y siempre
+    words: []
+    start_ms: 33246
+    end_ms: 37537
+  - text: Yo te quiero conmigo
+    words: []
+    start_ms: 40094
+    end_ms: 42722
+  - text: Necesito cuidados
+    words: []
+    start_ms: 43097
+    end_ms: 45711
+  - text: Necesito de ti
+    words: []
+    start_ms: 46057
+    end_ms: 49757
+  - text: 🧑🏻‍🎤 Si me voy, donde vaya
+    words: []
+    start_ms: 51159
+    end_ms: 54285
+  - text: Mmm yo te llevo conmigo
+    words: []
+    start_ms: 56561
+    end_ms: 60369
+  - text: No me dejes ir solo
+    words: []
+    start_ms: 60914
+    end_ms: 63520
+  - text: Necesito de ti
+    words: []
+    start_ms: 64148
+    end_ms: 67837
+  - text: 🎩 Tú me sabes bien cuidar
+    words: []
+    start_ms: 70095
+    end_ms: 72520
+  - text: Tú me sabes bien guiar
+    words: []
+    start_ms: 73060
+    end_ms: 75444
+  - text: Todo lo haces muy bien tú
+    words: []
+    start_ms: 76065
+    end_ms: 78320
+  - text: Ser muy buena es tu virtud
+    words: []
+    start_ms: 78344
+    end_ms: 81091
+  - text: 🧑🏻‍🎤 ¿Cómo te puedo pagar...
+    words: []
+    start_ms: 82072
+    end_ms: 84558
+  - text: todo lo que haces por mí?
+    words: []
+    start_ms: 85064
+    end_ms: 87383
+  - text: Todo lo feliz que soy
+    words: []
+    start_ms: 88070
+    end_ms: 90560
+  - text: Todo este inmenso amor
+    words: []
+    start_ms: 90968
+    end_ms: 93721
+  - text: 🎩 Solamente con mi vida
+    words: []
+    start_ms: 94126
+    end_ms: 97143
+  - text: Ten mi vida, te la doy
+    words: []
+    start_ms: 97743
+    end_ms: 104720
+  - text: 🧑🏻‍🎤 Pero no me dejes
+    words: []
+    start_ms: 105300
+    end_ms: 108939
+  - text: No me dejes
+    words: []
+    start_ms: 109633
+    end_ms: 112194
+  - text: 🎩 Te lo pido por favor
+    words: []
+    start_ms: 114737
+    end_ms: 119233
+  - text: ""
+    words: []
+    start_ms: 119233
+    end_ms: 124745
+  - text: 🧑🏻‍🎤 Mmmm yeah
+    words: []
+    start_ms: 124745
+    end_ms: 126004
+  - text: ""
+    words: []
+    start_ms: 126004
+    end_ms: 130854
+  - text: 🧑🏻‍🎤 Ooooh Eeeeh
+    words: []
+    start_ms: 130854
+    end_ms: 134287
+  - text: ""
+    words: []
+    start_ms: 134287
+    end_ms: 145841
+  - text: 🧑🏻‍🎤 Tú me sabes bien guiar
+    words: []
+    start_ms: 145841
+    end_ms: 147830
+  - text: Tú me sabes bien cuidar
+    words: []
+    start_ms: 148837
+    end_ms: 150905
+  - text: Todo lo haces muy bien tú
+    words: []
+    start_ms: 151820
+    end_ms: 153930
+  - text: Ser muy buena es tu virtud
+    words: []
+    start_ms: 154290
+    end_ms: 157072
+  - text: 🎩 ¿Cómo te puedo pagar...
+    words: []
+    start_ms: 157072
+    end_ms: 159546
+  - text: todo lo que haces por mí? (🧑🏻‍🎤Por mí)
+    words: []
+    start_ms: 160059
+    end_ms: 163098
+  - text: Todo lo feliz que soy
+    words: []
+    start_ms: 163101
+    end_ms: 165230
+  - text: Todo este inmenso amor
+    words: []
+    start_ms: 165420
+    end_ms: 167929
+  - text: 🧑🏻‍🎤 Solamente con mi vida
+    words: []
+    start_ms: 169723
+    end_ms: 172657
+  - text: ¿Quieres mi vida?
+    words: []
+    start_ms: 172657
+    end_ms: 174556
+  - text: Ven, yo te la doy
+    words: []
+    start_ms: 174556
+    end_ms: 180406
+  - text: 🎩 Pero no me dejes nunca
+    words: []
+    start_ms: 180406
+    end_ms: 183927
+  - text: Nunca, nunca
+    words: []
+    start_ms: 183927
+    end_ms: 187647
+  - text: "🧑🏻‍🎤 Júrame "
+    words: []
+    start_ms: 187647
+    end_ms: 190946
+  - text: Que no
+    words: []
+    start_ms: 190946
+    end_ms: 197524
+  - text: Uh
+    words: []
+    start_ms: 197524
+    end_ms: 198707
+  - text: 🎩 Pero no me dejes nunca (🧑🏻‍🎤No me dejes)
+    words: []
+    start_ms: 198707
+    end_ms: 202039
+  - text: Nunca, nunca (🧑🏻‍🎤Tú no me dejes)
+    words: []
+    start_ms: 202039
+    end_ms: 207472
+  - text: Te lo pido
+    words: []
+    start_ms: 207472
+    end_ms: 210452
+  - text: 🧑🏻‍🎤 Yo te lo pido
+    words: []
+    start_ms: 210452
+    end_ms: 212748
+  - text: 🎩 Por favor
+    words: []
+    start_ms: 212748
+    end_ms: 221215
+plain: |-
+  Donde estés hoy y siempre
+  Yo te quiero conmigo
+  Necesito cuidados
+  Necesito de ti
+  Si me voy, donde vaya
+  Yo te llevo conmigo
+  No me dejes ir solo
+  Necesito de ti
+
+  Tú me sabes bien cuidar
+  Tú me sabes bien guiar
+  Todo lo haces muy bien tú
+  Ser muy buena es tu virtud
+  ¿Cómo te puedo pagar todo lo que haces por mí?
+  Todo lo feliz que soy
+  Todo este inmenso amor
+
+  Solamente con mi vida
+  Ten mi vida, te la doy
+  Pero no me dejes
+  No me dejes
+  Te lo pido por favor
+
+  Tú me sabes bien guiar
+  Tú me sabes bien cuidar
+  Todo lo haces muy bien tú
+  Ser muy buena es tu virtud
+  ¿Cómo te puedo pagar todo lo que haces por mí? (Por mí)
+  Todo lo feliz que soy
+  Todo este inmenso amor
+
+  Solamente con mi vida
+  ¿Quieres mi vida?
+  Ven, yo te la doy
+  Pero no me dejes nunca
+  Nunca, nunca
+  Júrame que no
+
+  Pero no me dejes nunca (No me dejes)
+  Nunca, nunca (Tú no me dejes)
+  Te lo pido (Yo te lo pido)
+  Por favor

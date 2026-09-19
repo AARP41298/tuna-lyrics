@@ -5,6 +5,7 @@ import type {LineLyrics, LyricResult} from '../types';
 const SUPPORTED_VERSION = '1.0';
 const MAX_DOCUMENT_BYTES = 2_000_000;
 const LEADING_SILENCE_MS = 300;
+const CLOSING_SILENCE_MS = 10_000;
 
 export class LyricsfileError extends Error {
   constructor(message: string) {
@@ -284,6 +285,24 @@ function toParsedLines(doc: LyricsfileDocument): LyricsfileParsedLine[] {
       time: formatTime(0),
       timeInMs: 0,
       duration: first.timeInMs,
+      text: '',
+      words: [],
+    });
+  }
+
+  const last = lines.at(-1);
+  if (last?.text.trim()) {
+    const start = Number.isFinite(last.duration)
+      ? last.timeInMs + last.duration
+      : last.timeInMs;
+    const remaining =
+      doc.metadata.duration_ms !== undefined
+        ? doc.metadata.duration_ms - start
+        : CLOSING_SILENCE_MS;
+    lines.push({
+      time: formatTime(start),
+      timeInMs: start,
+      duration: Math.max(remaining, CLOSING_SILENCE_MS),
       text: '',
       words: [],
     });

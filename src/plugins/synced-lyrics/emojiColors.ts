@@ -37,7 +37,7 @@ export const EMOJI_PROGRESS_COLORS: Record<string, EmojiProgressColor> = {
   '🥷': {color: '#455a64'},
   '🤖': {color: '#78909c'},
   '🗣': {color: '#8d6e63'},
-  '🎩': {color: '#5d4037'},
+  '🎩': {color: '#543b66'},
   '👠': {color: '#d81b60'},
   '🗿': {color: '#795548'},
   '👨': {color: '#42a5f5'},
@@ -48,6 +48,7 @@ export const EMOJI_PROGRESS_COLORS: Record<string, EmojiProgressColor> = {
   '🕺': {color: '#26a69a'},
   '💃': {color: '#ef5350'},
   '👨‍🎤': {color: '#009af2'},
+  '🧑🏻‍🎤': {color: '#fd711e'},
 };
 
 function stripVariationSelectors(text: string): string {
