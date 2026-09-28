@@ -6,7 +6,7 @@ export type EmojiProgressColor = {
 };
 
 /** Default arc color when no emoji has been seen yet */
-export const DEFAULT_PROGRESS_COLOR = '#fd04fd';
+export const DEFAULT_PROGRESS_COLOR = '#1b123d';
 
 /** Default track when no override is set (Quasar grey-3-ish) */
 export const DEFAULT_PROGRESS_TRACK_COLOR = '#e0e0e0';
@@ -42,13 +42,14 @@ export const EMOJI_PROGRESS_COLORS: Record<string, EmojiProgressColor> = {
   '🗿': {color: '#795548'},
   '👨': {color: '#42a5f5'},
   '🎤': {color: '#ab47bc'},
-  // '🎙': {color: '#b5aebc'},
-  '🎙': {color: '#601824'}, //saco rojo marco antonio
+  '🎙': {color: '#b5aebc'},
+  // '🎙': {color: '#601824'}, //saco rojo marco antonio
   '🪶': {color: '#a1887f'},
   '🕺': {color: '#26a69a'},
   '💃': {color: '#ef5350'},
   '👨‍🎤': {color: '#009af2'},
   '🧑🏻‍🎤': {color: '#fd711e'},
+  '🌹': {color: '#ff442c'},
 };
 
 function stripVariationSelectors(text: string): string {
@@ -115,6 +116,36 @@ export function findLastProgressEmoji(text: string): string | null {
   }
 
   return bestKey;
+}
+
+/** Voice markers in a line, including those inside (...), in appearance order. */
+export function findLineVoiceEmojis(text: string): string[] {
+  const haystack = stripVariationSelectors(text);
+  if (!haystack) return [];
+
+  const taken: {start: number; end: number}[] = [];
+  const found: {index: number; key: string}[] = [];
+
+  for (const needle of NORMALIZED_EMOJI_KEYS) {
+    let from = 0;
+    let idx: number;
+    while ((idx = haystack.indexOf(needle, from)) !== -1) {
+      const end = idx + needle.length;
+      const overlaps = taken.some((range) => idx < range.end && end > range.start);
+      if (!overlaps) {
+        taken.push({start: idx, end});
+        found.push({index: idx, key: needle});
+      }
+      from = idx + Math.max(1, needle.length);
+    }
+  }
+
+  found.sort((a, b) => a.index - b.index);
+  const unique: string[] = [];
+  for (const item of found) {
+    if (!unique.includes(item.key)) unique.push(item.key);
+  }
+  return unique;
 }
 
 export type ProgressColorState = {

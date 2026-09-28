@@ -1,0 +1,753 @@
+version: "1.0"
+metadata:
+  title: Amárrame
+  artist: Mon Laferte/Juanes
+  instrumental: false
+  album: La Trenza
+  duration_ms: 207000
+lines:
+  - text: 🌹Ay
+    words: []
+    start_ms: 5576
+    end_ms: 6917
+  - text: Quiéreme de a poco
+    words:
+      - text: "Quiéreme "
+        start_ms: 7412
+        end_ms: 8171
+      - text: "de a "
+        start_ms: 8171
+        end_ms: 8483
+      - text: poco
+        start_ms: 8483
+    start_ms: 7412
+    end_ms: 9607
+  - text: Pero que no me dé cuenta y que nadie sepa
+    words:
+      - text: "Pero "
+        start_ms: 10089
+        end_ms: 10618
+      - text: "que "
+        start_ms: 10618
+        end_ms: 10912
+      - text: "no "
+        start_ms: 10912
+        end_ms: 11118
+      - text: "me "
+        start_ms: 11118
+        end_ms: 11588
+      - text: "dé cuenta "
+        start_ms: 11588
+        end_ms: 12538
+      - text: "y "
+        start_ms: 12538
+        end_ms: 12958
+      - text: "que "
+        start_ms: 12958
+        end_ms: 13150
+      - text: "nadie "
+        start_ms: 13150
+        end_ms: 13768
+      - text: sepa
+        start_ms: 13768
+        end_ms: 14910
+    start_ms: 10089
+    end_ms: 14910
+  - text: Ven
+    words:
+      - text: Ven
+        start_ms: 16242
+        end_ms: 17126
+    start_ms: 16242
+    end_ms: 17126
+  - text: Y cuídame
+    words:
+      - text: "Y "
+        start_ms: 18384
+        end_ms: 18549
+      - text: cuídame
+        start_ms: 18549
+        end_ms: 19907
+    start_ms: 18384
+    end_ms: 19907
+  - text: Pero que parezca que me estás haciendo daño
+    words:
+      - text: "Pero "
+        start_ms: 20747
+        end_ms: 21326
+      - text: "que "
+        start_ms: 21326
+        end_ms: 21606
+      - text: "parezca "
+        start_ms: 21606
+        end_ms: 22456
+      - text: "que "
+        start_ms: 22456
+        end_ms: 22926
+      - text: "me estás "
+        start_ms: 22926
+        end_ms: 23616
+      - text: "haciendo "
+        start_ms: 23616
+        end_ms: 24425
+      - text: daño
+        start_ms: 24425
+        end_ms: 25601
+    start_ms: 20747
+    end_ms: 25601
+  - text: Amárrame
+    words:
+      - text: Amárrame
+        start_ms: 26370
+        end_ms: 28583
+    start_ms: 26370
+    end_ms: 28583
+  - text: (🎙️Aquí vamos, mami)
+    words:
+      - text: "(🎙️Aquí "
+        start_ms: 30906
+        end_ms: 31245
+      - text: "vamos, "
+        start_ms: 31245
+        end_ms: 31545
+      - text: mami)
+        start_ms: 31545
+    start_ms: 30906
+    end_ms: 32200
+  - text: 🎙️Ay
+    words:
+      - text: 🎙️Ay
+        start_ms: 32200
+        end_ms: 33638
+    start_ms: 32200
+    end_ms: 33638
+  - text: Finge que no te gustó
+    words:
+      - text: "Finge "
+        start_ms: 34078
+        end_ms: 34547
+      - text: "que "
+        start_ms: 34547
+        end_ms: 34877
+      - text: "no "
+        start_ms: 34877
+        end_ms: 35097
+      - text: "te "
+        start_ms: 35097
+        end_ms: 35437
+      - text: gustó
+        start_ms: 35437
+    start_ms: 34078
+    end_ms: 36409
+  - text: Dame una mirada y luego vuél-vete lejana
+    words:
+      - text: "Dame "
+        start_ms: 36730
+        end_ms: 37169
+      - text: "una "
+        start_ms: 37169
+        end_ms: 37549
+      - text: "mirada "
+        start_ms: 37549
+        end_ms: 38448
+      - text: "y luego "
+        start_ms: 38448
+        end_ms: 38979
+      - text: vuél-
+        start_ms: 38979
+        end_ms: 39729
+      - text: "vete "
+        start_ms: 39729
+        end_ms: 40228
+      - text: lejana
+        start_ms: 40228
+        end_ms: 41519
+    start_ms: 36730
+    end_ms: 41519
+  - text: Y, sin querer
+    words:
+      - text: "Y, "
+        start_ms: 42392
+        end_ms: 42461
+      - text: "sin "
+        start_ms: 42461
+        end_ms: 42861
+      - text: querer
+        start_ms: 42861
+        end_ms: 44143
+    start_ms: 42392
+    end_ms: 44143
+  - text: Búscame y déjame
+    words:
+      - text: "Búscame "
+        start_ms: 44672
+        end_ms: 45611
+      - text: "y "
+        start_ms: 45611
+        end_ms: 45781
+      - text: déjame
+        start_ms: 45781
+    start_ms: 44672
+    end_ms: 47191
+  - text: Llámame pero no me hables, bésame y ahógame
+    words:
+      - text: "Llámame "
+        start_ms: 47349
+        end_ms: 48168
+      - text: "pero "
+        start_ms: 48168
+        end_ms: 49058
+      - text: "no "
+        start_ms: 49058
+        end_ms: 49208
+      - text: "me hables, "
+        start_ms: 49208
+        end_ms: 49768
+      - text: "bésame "
+        start_ms: 49768
+        end_ms: 50718
+      - text: y ahógame
+        start_ms: 50718
+        end_ms: 52478
+    start_ms: 47349
+    end_ms: 52478
+  - text: Amárrame
+    words:
+      - text: Amárrame
+        start_ms: 53049
+        end_ms: 54969
+    start_ms: 53049
+    end_ms: 54969
+  - text: 🌹🎙️Cú-ra-me
+    words:
+      - text: 🌹🎙️Cú-
+        start_ms: 56567
+        end_ms: 58596
+      - text: ra-
+        start_ms: 58596
+        end_ms: 59286
+      - text: me
+        start_ms: 59286
+    start_ms: 56567
+    end_ms: 61219
+  - text: Y enférmame de a poco, poco a poco
+    words:
+      - text: "Y "
+        start_ms: 61377
+        end_ms: 61637
+      - text: "enférmame "
+        start_ms: 61637
+        end_ms: 63016
+      - text: "de a "
+        start_ms: 63016
+        end_ms: 63166
+      - text: "poco, "
+        start_ms: 63166
+        end_ms: 63906
+      - text: "poco "
+        start_ms: 63906
+        end_ms: 64425
+      - text: a poco
+        start_ms: 64425
+        end_ms: 66549
+    start_ms: 61377
+    end_ms: 66549
+  - text: Cú-ra-me
+    words:
+      - text: Cú-
+        start_ms: 67254
+        end_ms: 69222
+      - text: ra-
+        start_ms: 69222
+        end_ms: 69869
+      - text: me
+        start_ms: 69869
+        end_ms: 71873
+    start_ms: 67254
+    end_ms: 71873
+  - text: Y transfórmame en un loco, poco a poco
+    words:
+      - text: "Y "
+        start_ms: 72036
+        end_ms: 72204
+      - text: "transfórmame en "
+        start_ms: 72204
+        end_ms: 73715
+      - text: "un "
+        start_ms: 73715
+        end_ms: 73885
+      - text: "loco, "
+        start_ms: 73885
+        end_ms: 74555
+      - text: "poco "
+        start_ms: 74555
+        end_ms: 75075
+      - text: "a "
+        start_ms: 75075
+        end_ms: 75245
+      - text: poco
+        start_ms: 75245
+        end_ms: 76682
+    start_ms: 72036
+    end_ms: 76682
+  - text: Amárrame
+    words:
+      - text: Amárrame
+        start_ms: 76998
+        end_ms: 78443
+    start_ms: 76998
+    end_ms: 78443
+  - text: ""
+    words: []
+    start_ms: 78443
+    end_ms: 83044
+  - text: 🎙️Ay
+    words:
+      - text: 🎙️Ay
+        start_ms: 83044
+        end_ms: 84302
+    start_ms: 83044
+    end_ms: 84302
+  - text: Quiero ver tu perversión
+    words:
+      - text: "Quiero "
+        start_ms: 84728
+        end_ms: 85237
+      - text: "ver "
+        start_ms: 85237
+        end_ms: 85517
+      - text: "tu "
+        start_ms: 85517
+        end_ms: 85737
+      - text: perversión
+        start_ms: 85737
+        end_ms: 86952
+    start_ms: 84728
+    end_ms: 86952
+  - text: Hasta dónde llegas, hasta dónde me has llevado
+    words:
+      - text: "Hasta "
+        start_ms: 87419
+        end_ms: 87938
+      - text: "dónde "
+        start_ms: 87938
+        end_ms: 88438
+      - text: "llegas, "
+        start_ms: 88438
+        end_ms: 89288
+      - text: "hasta "
+        start_ms: 89288
+        end_ms: 89738
+      - text: "dónde "
+        start_ms: 89738
+        end_ms: 90498
+      - text: "me has "
+        start_ms: 90498
+        end_ms: 90848
+      - text: llevado
+        start_ms: 90848
+    start_ms: 87419
+    end_ms: 92255
+  - text: Ignórame
+    words:
+      - text: Ignórame
+        start_ms: 93039
+        end_ms: 94396
+    start_ms: 93039
+    end_ms: 94396
+  - text: Ven y pierde la razón
+    words:
+      - text: "Ven "
+        start_ms: 95345
+        end_ms: 95714
+      - text: "y "
+        start_ms: 95714
+        end_ms: 95934
+      - text: "pierde "
+        start_ms: 95934
+        end_ms: 96374
+      - text: "la "
+        start_ms: 96374
+        end_ms: 96681
+      - text: razón
+        start_ms: 96681
+        end_ms: 97635
+    start_ms: 95345
+    end_ms: 97635
+  - text: Quiero que me ruegues y me mires a los ojos
+    words:
+      - text: "Quiero "
+        start_ms: 98067
+        end_ms: 98586
+      - text: "que "
+        start_ms: 98586
+        end_ms: 98846
+      - text: "me "
+        start_ms: 98846
+        end_ms: 98986
+      - text: "ruegues "
+        start_ms: 98986
+        end_ms: 99956
+      - text: "y "
+        start_ms: 99956
+        end_ms: 100226
+      - text: "me "
+        start_ms: 100226
+        end_ms: 100386
+      - text: "mires "
+        start_ms: 100386
+        end_ms: 101236
+      - text: "a "
+        start_ms: 101236
+        end_ms: 101556
+      - text: "los "
+        start_ms: 101556
+        end_ms: 101806
+      - text: ojos
+        start_ms: 101806
+        end_ms: 103307
+    start_ms: 98067
+    end_ms: 103307
+  - text: 🌹Dame la espalda
+    words:
+      - text: "🌹Dame la "
+        start_ms: 103698
+        end_ms: 104077
+      - text: espalda
+        start_ms: 104077
+        end_ms: 105311
+    start_ms: 103698
+    end_ms: 105311
+  - text: Desenfócame
+    words:
+      - text: Desenfócame
+        start_ms: 106064
+        end_ms: 107610
+    start_ms: 106064
+    end_ms: 107610
+  - text: Tómame del pelo y repíteme mi nombre
+    words:
+      - text: "Tómame "
+        start_ms: 108715
+        end_ms: 109414
+      - text: "del "
+        start_ms: 109414
+        end_ms: 109724
+      - text: "pelo "
+        start_ms: 109724
+        end_ms: 110414
+      - text: "y "
+        start_ms: 110414
+        end_ms: 110824
+      - text: "repíteme "
+        start_ms: 110824
+        end_ms: 112114
+      - text: "mi "
+        start_ms: 112114
+        end_ms: 112414
+      - text: nombre
+        start_ms: 112414
+        end_ms: 113424
+    start_ms: 108715
+    end_ms: 113424
+  - text: Y ámame
+    words:
+      - text: "Y "
+        start_ms: 114315
+        end_ms: 114524
+      - text: ámame
+        start_ms: 114524
+        end_ms: 115752
+    start_ms: 114315
+    end_ms: 115752
+  - text: Pero sin querer
+    words:
+      - text: "Pero "
+        start_ms: 116744
+        end_ms: 117153
+      - text: "sin "
+        start_ms: 117153
+        end_ms: 117683
+      - text: querer
+        start_ms: 117683
+    start_ms: 116744
+    end_ms: 118554
+  - text: Deja que te lleve que mañana acaba todo
+    words:
+      - text: "Deja "
+        start_ms: 119361
+        end_ms: 119840
+      - text: "que "
+        start_ms: 119840
+        end_ms: 120120
+      - text: "te "
+        start_ms: 120120
+        end_ms: 120370
+      - text: "lleve "
+        start_ms: 120370
+        end_ms: 121010
+      - text: "que "
+        start_ms: 121010
+        end_ms: 121570
+      - text: "mañana "
+        start_ms: 121570
+        end_ms: 122299
+      - text: "acaba "
+        start_ms: 122299
+        end_ms: 123090
+      - text: todo
+        start_ms: 123090
+        end_ms: 124309
+    start_ms: 119361
+    end_ms: 124309
+  - text: Amárrame
+    words:
+      - text: Amárrame
+        start_ms: 125001
+        end_ms: 126453
+    start_ms: 125001
+    end_ms: 126453
+  - text: 🌹🎙️Cú-ra-me
+    words:
+      - text: 🌹🎙️Cú-
+        start_ms: 128568
+        end_ms: 130557
+      - text: ra-
+        start_ms: 130557
+        end_ms: 131167
+      - text: me
+        start_ms: 131167
+    start_ms: 128568
+    end_ms: 133127
+  - text: Y enférmame de a poco, poco a poco
+    words:
+      - text: "Y "
+        start_ms: 133400
+        end_ms: 133759
+      - text: "enférmame "
+        start_ms: 133759
+        end_ms: 135049
+      - text: "de a "
+        start_ms: 135049
+        end_ms: 135259
+      - text: "poco, "
+        start_ms: 135259
+        end_ms: 135919
+      - text: "poco "
+        start_ms: 135919
+        end_ms: 136429
+      - text: a poco
+        start_ms: 136429
+    start_ms: 133400
+    end_ms: 138500
+  - text: Cú-ra-me
+    words:
+      - text: Cú-
+        start_ms: 139221
+        end_ms: 141250
+      - text: ra-
+        start_ms: 141250
+        end_ms: 141820
+      - text: me
+        start_ms: 141820
+    start_ms: 139221
+    end_ms: 143760
+  - text: Transfórmame en un loco, poco a poco
+    words:
+      - text: "Transfórmame "
+        start_ms: 144119
+        end_ms: 145590
+      - text: "en un "
+        start_ms: 145590
+        end_ms: 145888
+      - text: "loco, "
+        start_ms: 145888
+        end_ms: 146538
+      - text: "poco "
+        start_ms: 146538
+        end_ms: 146998
+      - text: a poco
+        start_ms: 146998
+        end_ms: 148592
+    start_ms: 144119
+    end_ms: 148592
+  - text: Amárrame
+    words:
+      - text: Amárrame
+        start_ms: 148975
+        end_ms: 150445
+    start_ms: 148975
+    end_ms: 150445
+  - text: ""
+    words: []
+    start_ms: 150445
+    end_ms: 176495
+  - text: 🎙️🌹️Cú-ra-me (🌹Ay cúrame)
+    words:
+      - text: 🎙️🌹️Cú-ra-me
+        start_ms: 176495
+        end_ms: 178564
+      - text: ra-
+        start_ms: 178564
+        end_ms: 179284
+      - text: "me "
+        start_ms: 179284
+        end_ms: 180194
+      - text: "(🌹Ay "
+        start_ms: 180194
+        end_ms: 180634
+      - text: cúrame)
+        start_ms: 180634
+    start_ms: 176495 
+    end_ms: 181544
+  - text: 🎙️🌹Y enférmame de a poco, poco a poco (🌹Y, como loco, loquito)
+    words:
+      - text: "🎙️🌹Y enférmame "
+        start_ms: 181544
+        end_ms: 183003
+      - text: "de a "
+        start_ms: 183003
+        end_ms: 183243
+      - text: "poco, "
+        start_ms: 183243
+        end_ms: 183923
+      - text: "poco "
+        start_ms: 183923
+        end_ms: 184462
+      - text: "a poco "
+        start_ms: 184462
+        end_ms: 185383
+      - text: "(🌹Y, "
+        start_ms: 185383
+        end_ms: 185702
+      - text: "como "
+        start_ms: 185702
+        end_ms: 185872
+      - text: "loco, "
+        start_ms: 185872
+        end_ms: 186454
+      - text: loquito)
+        start_ms: 186454
+    start_ms: 181544
+    end_ms: 186869
+  - text: 🎙️Cú-ra-me
+    words:
+      - text: 🎙️Cú-
+        start_ms: 187235
+        end_ms: 189169
+      - text: ra-
+        start_ms: 189169
+        end_ms: 189904
+      - text: me
+        start_ms: 189904
+    start_ms: 187235
+    end_ms: 190961
+  - text: (🌹Ay, curame mi amor)
+    words:
+      - text: "(🌹Ay, "
+        start_ms: 190961
+        end_ms: 191380
+      - text: "curame "
+        start_ms: 191380
+        end_ms: 192110
+      - text: "mi "
+        start_ms: 192110
+        end_ms: 192260
+      - text: amor)
+        start_ms: 192260
+        end_ms: 192700
+    start_ms: 190961
+    end_ms: 192700
+  - text: 🎙️Transfórmame en un loco, poco a poco
+    words:
+      - text: "🎙️Transfórmame "
+        start_ms: 192202
+        end_ms: 193541
+      - text: "en un "
+        start_ms: 193541
+        end_ms: 193951
+      - text: "loco, "
+        start_ms: 193951
+        end_ms: 194541
+      - text: "poco "
+        start_ms: 194541
+        end_ms: 195111
+      - text: a poco
+        start_ms: 195111
+    start_ms: 192202
+    end_ms: 196900
+  - text: (🌹No me mires a los ojos)
+    words:
+      - text: "(🌹No me "
+        start_ms: 195011
+        end_ms: 195300
+      - text: "mires "
+        start_ms: 195300
+        end_ms: 195760
+      - text: "a "
+        start_ms: 195760
+        end_ms: 196010
+      - text: "los "
+        start_ms: 196010
+        end_ms: 196270
+      - text: ojos)
+        start_ms: 196270
+    start_ms: 195011
+    end_ms: 197046
+  - text: 🌹🎙️Amárrame
+    words:
+      - text: 🌹🎙️Amárrame
+        start_ms: 197046
+        end_ms: 198452
+    start_ms: 197046
+    end_ms: 198452
+  - text: (Oy)
+    words:
+      - text: (Oy)
+        start_ms: 198923
+        end_ms: 199343
+    start_ms: 198923
+    end_ms: 199343
+plain: |-
+  Ay, quiéreme de a poco
+  Pero que no me dé cuenta y que nadie sepa
+  Ven y cuídame
+  Pero que parezca que me estás haciendo daño
+  Amárrame
+
+  (Aquí vamos, mami)
+  Ay, finge que no te gustó
+  Dame una mirada y luego vuélvete lejana
+  Y, sin querer, búscame y déjame
+  Llámame pero no me hables, bésame y ahógame
+  Amárrame
+
+  Cúrame
+  Y enférmame de a poco, poco a poco
+  Cúrame
+  Y transfórmame en un loco, poco a poco
+  Amárrame
+
+  Ay, quiero ver tu perversión
+  Hasta dónde llegas, hasta dónde me has llevado
+  Ignórame
+  Ven y pierde la razón
+  Quiero que me ruegues y me mires a los ojos
+
+  Dame la espalda, desenfócame
+  Tómame del pelo y repíteme mi nombre
+  Y ámame, pero sin querer
+  Deja que te lleve que mañana acaba todo
+  Amárrame
+
+  Cúrame
+  Y enférmame de a poco, poco a poco
+  Cúrame
+  Y transfórmame en un loco, poco a poco
+  Amárrame
+
+  Cúrame (Ven y pierde la razón)
+  Y enférmame de a poco, poco a poco (Ay, todo loco, loquito)
+  Cúrame (Ay, déjame)
+  Y transfórmame en un loco, poco a poco (Que me mires a los ojos)
+  Amárrame (Oy)

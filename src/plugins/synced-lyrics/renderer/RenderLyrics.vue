@@ -143,7 +143,7 @@ marcaFont.value = heightStore.baseFont
        style="overflow: hidden;
   margin: 0;
   padding: 0;">
-     <span :style="{
+     <span class="credit-stroke" :style="{
        'font-size': marcaFont + 'rem',
         color: 'white',
          position: 'absolute',
@@ -158,6 +158,25 @@ marcaFont.value = heightStore.baseFont
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@use "sass:math";
+@use "sass:list";
 
+@mixin math-text-outline($offset, $color, $num-steps: 16) {
+  $shadows: ();
+  @for $i from 0 to $num-steps {
+    $angle: math.div($i * 360deg, $num-steps);
+    $x: calc(#{math.cos($angle)} * #{$offset});
+    $y: calc(#{math.sin($angle)} * #{$offset});
+    $shadows: list.append($shadows, #{$x} #{$y} 0 #{$color}, $separator: comma);
+  }
+
+  text-shadow: $shadows;
+}
+
+.credit-stroke {
+  @include math-text-outline($offset: calc(0.08vh + 0.04em),
+    $color: black,
+    $num-steps: 16);
+}
 </style>

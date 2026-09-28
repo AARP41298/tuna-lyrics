@@ -327,13 +327,43 @@ const currentBlockIndex = computed(() => {
 
 const blockHeights = ref<number[]>([])
 const blockEls = ref<(HTMLElement | null)[]>([])
+const paneInnerEls = ref<(HTMLElement | null)[][]>([])
+const paneHeights = ref<{left: number[]; right: number[]}[]>([])
+
+const sceneHeightCss = computed(() => `${heightStore.height}px`)
 
 const setBlockRef = (el: unknown, index: number) => {
   blockEls.value[index] = el instanceof HTMLElement ? el : null
 }
 
+const setPaneInnerRef = (el: unknown, blockIndex: number, side: 0 | 1) => {
+  if (!paneInnerEls.value[blockIndex]) paneInnerEls.value[blockIndex] = [null, null]
+  const row = paneInnerEls.value[blockIndex]
+  if (!row) return
+  row[side] = el instanceof HTMLElement ? el : null
+}
+
+function childHeights(el: HTMLElement | null): number[] {
+  if (!el) return []
+  return Array.from(el.children, (child) =>
+    child instanceof HTMLElement ? child.offsetHeight : 0,
+  )
+}
+
 function updateLineHeights() {
-  blockHeights.value = lyricBlocks.value.map((_, index) => blockEls.value[index]?.offsetHeight || 0)
+  blockHeights.value = lyricBlocks.value.map((block, index) =>
+    block.kind === 'split'
+      ? heightStore.height
+      : blockEls.value[index]?.offsetHeight || 0,
+  )
+  paneHeights.value = lyricBlocks.value.map((block, index) => {
+    if (block.kind !== 'split') return {left: [], right: []}
+    const panes = paneInnerEls.value[index]
+    return {
+      left: childHeights(panes?.[0] ?? null),
+      right: childHeights(panes?.[1] ?? null),
+    }
+  })
 }
 
 watch(lyricBlocks, async () => {
@@ -346,6 +376,59 @@ function offsetForBlock(idx: number): number {
   const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
   const currentHeight = blockHeights.value[idx] || 0
   return centerOffset - (sumPrev + currentHeight / 2)
+}
+
+function offsetAt(heights: number[], localIdx: number): number {
+  const sumPrev = heights.slice(0, localIdx).reduce((a, b) => a + b, 0)
+  const currentHeight = heights[localIdx] || 0
+  return centerOffset - (sumPrev + currentHeight / 2)
+}
+
+function easeProgress(tNow: number, animStart: number, animEnd: number): number {
+  const progress = (tNow - animStart) / (animEnd - animStart)
+  return progress < 0.5
+    ? 2 * progress * progress
+    : -1 + (4 - 2 * progress) * progress
+}
+
+function currentLocalIndex(indices: number[]): number {
+  const checkLines = lines.value ?? []
+  const tNow = currentTime.value
+  const active = indices.findIndex((index) => {
+    const line = checkLines[index]
+    return !!line && tNow >= line.timeInMs && tNow < line.timeInMs + line.duration
+  })
+  if (active !== -1) return active
+
+  let lastStarted = 0
+  for (let i = 0; i < indices.length; i++) {
+    const line = checkLines[indices[i] ?? -1]
+    if (!line || line.timeInMs > tNow) break
+    lastStarted = i
+  }
+  return lastStarted
+}
+
+function paneOffsetAnimated(blockIndex: number, side: 'left' | 'right'): number {
+  const block = lyricBlocks.value[blockIndex]
+  if (!block || block.kind !== 'split') return 0
+
+  const indices = side === 'left' ? block.left : block.right
+  const heights = paneHeights.value[blockIndex]?.[side] ?? []
+  const local = currentLocalIndex(indices)
+  const from = offsetAt(heights, local)
+
+  const nextIndex = indices[local + 1]
+  const nextLine = nextIndex === undefined ? undefined : lines.value?.[nextIndex]
+  if (!nextLine) return from
+
+  const animStart = nextLine.timeInMs - 200
+  const animEnd = nextLine.timeInMs + 200
+  const tNow = currentTime.value
+  if (tNow <= animStart) return from
+  const to = offsetAt(heights, local + 1)
+  if (tNow >= animEnd) return to
+  return from + (to - from) * easeProgress(tNow, animStart, animEnd)
 }
 
 const offsetY = computed(() => offsetForBlock(currentBlockIndex.value))
@@ -366,12 +449,7 @@ const offsetYAnimated = computed(() => {
   if (tNow <= animStart) return offsetY.value
   if (tNow >= animEnd) return offsetForBlock(idx + 1)
 
-  const progress = (tNow - animStart) / (animEnd - animStart)
-  const ease = progress < 0.5
-    ? 2 * progress * progress
-    : -1 + (4 - 2 * progress) * progress
-
-  return offsetY.value + (offsetForBlock(idx + 1) - offsetY.value) * ease
+  return offsetY.value + (offsetForBlock(idx + 1) - offsetY.value) * easeProgress(tNow, animStart, animEnd)
 })
 </script>
 
@@ -396,36 +474,49 @@ const offsetYAnimated = computed(() => {
         :key="'block-'+b"
         class="lyric-block"
         :class="{ 'lyric-split': block.kind === 'split' }"
+        :style="block.kind === 'split' ? { height: sceneHeightCss } : undefined"
         :ref="(el) => setBlockRef(el, b)"
       >
         <template v-if="block.kind === 'split'">
           <div class="lyric-split-pane lyric-split-left">
-            <SyncedLine
-              v-for="i in block.left"
-              :key="'L'+i"
-              :line="lines[i]!"
-              :index="i"
-              :is-last="i === lines.length - 1"
-              :current="currentTime"
-              :durationMs="durationMs"
-              :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
-              :artists="searchResult?.artists ?? []"
-              split-side="left"
-            />
+            <div
+              class="lyric-split-inner"
+              :ref="(el) => setPaneInnerRef(el, b, 0)"
+              :style="{ transform: `translateY(${paneOffsetAnimated(b, 'left')}px)` }"
+            >
+              <SyncedLine
+                v-for="i in block.left"
+                :key="'L'+i"
+                :line="lines[i]!"
+                :index="i"
+                :is-last="i === lines.length - 1"
+                :current="currentTime"
+                :durationMs="durationMs"
+                :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
+                :artists="searchResult?.artists ?? []"
+                split-side="left"
+              />
+            </div>
           </div>
           <div class="lyric-split-pane lyric-split-right">
-            <SyncedLine
-              v-for="i in block.right"
-              :key="'R'+i"
-              :line="lines[i]!"
-              :index="i"
-              :is-last="i === lines.length - 1"
-              :current="currentTime"
-              :durationMs="durationMs"
-              :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
-              :artists="searchResult?.artists ?? []"
-              split-side="right"
-            />
+            <div
+              class="lyric-split-inner"
+              :ref="(el) => setPaneInnerRef(el, b, 1)"
+              :style="{ transform: `translateY(${paneOffsetAnimated(b, 'right')}px)` }"
+            >
+              <SyncedLine
+                v-for="i in block.right"
+                :key="'R'+i"
+                :line="lines[i]!"
+                :index="i"
+                :is-last="i === lines.length - 1"
+                :current="currentTime"
+                :durationMs="durationMs"
+                :next-duration="lines[i + 1]?.duration ?? Number.POSITIVE_INFINITY"
+                :artists="searchResult?.artists ?? []"
+                split-side="right"
+              />
+            </div>
           </div>
         </template>
         <SyncedLine
@@ -462,14 +553,22 @@ const offsetYAnimated = computed(() => {
 .lyric-split {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
+  overflow: hidden;
 }
 
 .lyric-split-pane {
   flex: 1 1 50%;
   min-width: 0;
   max-width: 50%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.lyric-split-inner {
+  width: 100%;
 }
 
 .lyric-split-left {
