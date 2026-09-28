@@ -330,8 +330,6 @@ const blockEls = ref<(HTMLElement | null)[]>([])
 const paneInnerEls = ref<(HTMLElement | null)[][]>([])
 const paneHeights = ref<{left: number[]; right: number[]}[]>([])
 
-const sceneHeightCss = computed(() => `${heightStore.height}px`)
-
 const setBlockRef = (el: unknown, index: number) => {
   blockEls.value[index] = el instanceof HTMLElement ? el : null
 }
@@ -343,26 +341,48 @@ const setPaneInnerRef = (el: unknown, blockIndex: number, side: 0 | 1) => {
   row[side] = el instanceof HTMLElement ? el : null
 }
 
-function childHeights(el: HTMLElement | null): number[] {
+function measureMaxHeight(el: HTMLElement): number {
+  const clone = el.cloneNode(true) as HTMLElement
+  clone.style.position = 'absolute'
+  clone.style.visibility = 'hidden'
+  clone.style.pointerEvents = 'none'
+  clone.style.left = '0'
+  clone.style.top = '0'
+  clone.style.width = `${el.offsetWidth}px`
+  clone.querySelectorAll<HTMLElement>('.lyric-word').forEach((word) => {
+    word.style.fontSize = `${heightStore.maxFont}vh`
+    word.style.fontWeight = 'bold'
+  })
+  const mountAt = document.getElementById('scene') ?? el
+  mountAt.appendChild(clone)
+  const height = clone.offsetHeight
+  clone.remove()
+  return height
+}
+
+function childMaxHeights(el: HTMLElement | null): number[] {
   if (!el) return []
   return Array.from(el.children, (child) =>
-    child instanceof HTMLElement ? child.offsetHeight : 0,
+    child instanceof HTMLElement ? measureMaxHeight(child) : 0,
   )
 }
 
 function updateLineHeights() {
-  blockHeights.value = lyricBlocks.value.map((block, index) =>
-    block.kind === 'split'
-      ? heightStore.height
-      : blockEls.value[index]?.offsetHeight || 0,
-  )
   paneHeights.value = lyricBlocks.value.map((block, index) => {
     if (block.kind !== 'split') return {left: [], right: []}
     const panes = paneInnerEls.value[index]
     return {
-      left: childHeights(panes?.[0] ?? null),
-      right: childHeights(panes?.[1] ?? null),
+      left: childMaxHeights(panes?.[0] ?? null),
+      right: childMaxHeights(panes?.[1] ?? null),
     }
+  })
+  blockHeights.value = lyricBlocks.value.map((block, index) => {
+    if (block.kind === 'split') {
+      const panes = paneHeights.value[index]
+      const all = [...(panes?.left ?? []), ...(panes?.right ?? [])]
+      return all.length ? Math.max(...all) : 0
+    }
+    return blockEls.value[index]?.offsetHeight || 0
   })
 }
 
@@ -378,10 +398,10 @@ function offsetForBlock(idx: number): number {
   return centerOffset - (sumPrev + currentHeight / 2)
 }
 
-function offsetAt(heights: number[], localIdx: number): number {
+function offsetAt(heights: number[], localIdx: number, viewport: number): number {
   const sumPrev = heights.slice(0, localIdx).reduce((a, b) => a + b, 0)
   const currentHeight = heights[localIdx] || 0
-  return centerOffset - (sumPrev + currentHeight / 2)
+  return viewport / 2 - (sumPrev + currentHeight / 2)
 }
 
 function easeProgress(tNow: number, animStart: number, animEnd: number): number {
@@ -415,8 +435,9 @@ function paneOffsetAnimated(blockIndex: number, side: 'left' | 'right'): number 
 
   const indices = side === 'left' ? block.left : block.right
   const heights = paneHeights.value[blockIndex]?.[side] ?? []
+  const viewport = blockHeights.value[blockIndex] || 0
   const local = currentLocalIndex(indices)
-  const from = offsetAt(heights, local)
+  const from = offsetAt(heights, local, viewport)
 
   const nextIndex = indices[local + 1]
   const nextLine = nextIndex === undefined ? undefined : lines.value?.[nextIndex]
@@ -426,7 +447,7 @@ function paneOffsetAnimated(blockIndex: number, side: 'left' | 'right'): number 
   const animEnd = nextLine.timeInMs + 200
   const tNow = currentTime.value
   if (tNow <= animStart) return from
-  const to = offsetAt(heights, local + 1)
+  const to = offsetAt(heights, local + 1, viewport)
   if (tNow >= animEnd) return to
   return from + (to - from) * easeProgress(tNow, animStart, animEnd)
 }
@@ -474,7 +495,7 @@ const offsetYAnimated = computed(() => {
         :key="'block-'+b"
         class="lyric-block"
         :class="{ 'lyric-split': block.kind === 'split' }"
-        :style="block.kind === 'split' ? { height: sceneHeightCss } : undefined"
+        :style="block.kind === 'split' && blockHeights[b] ? { height: blockHeights[b] + 'px' } : undefined"
         :ref="(el) => setBlockRef(el, b)"
       >
         <template v-if="block.kind === 'split'">

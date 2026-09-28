@@ -643,55 +643,15 @@ lines:
     start_ms: 187235
     end_ms: 190961
   - text: (🌹Ay, curame mi amor)
-    words:
-      - text: "(🌹Ay, "
-        start_ms: 190961
-        end_ms: 191380
-      - text: "curame "
-        start_ms: 191380
-        end_ms: 192110
-      - text: "mi "
-        start_ms: 192110
-        end_ms: 192260
-      - text: amor)
-        start_ms: 192260
-        end_ms: 192700
+    words: []
     start_ms: 190961
     end_ms: 192700
   - text: 🎙️Transfórmame en un loco, poco a poco
-    words:
-      - text: "🎙️Transfórmame "
-        start_ms: 192202
-        end_ms: 193541
-      - text: "en un "
-        start_ms: 193541
-        end_ms: 193951
-      - text: "loco, "
-        start_ms: 193951
-        end_ms: 194541
-      - text: "poco "
-        start_ms: 194541
-        end_ms: 195111
-      - text: a poco
-        start_ms: 195111
+    words: []
     start_ms: 192202
     end_ms: 196900
   - text: (🌹No me mires a los ojos)
-    words:
-      - text: "(🌹No me "
-        start_ms: 195011
-        end_ms: 195300
-      - text: "mires "
-        start_ms: 195300
-        end_ms: 195760
-      - text: "a "
-        start_ms: 195760
-        end_ms: 196010
-      - text: "los "
-        start_ms: 196010
-        end_ms: 196270
-      - text: ojos)
-        start_ms: 196270
+    words: []
     start_ms: 195011
     end_ms: 197046
   - text: 🌹🎙️Amárrame
