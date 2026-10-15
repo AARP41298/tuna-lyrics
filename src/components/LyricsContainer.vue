@@ -325,10 +325,10 @@ const currentBlockIndex = computed(() => {
   return lastStarted;
 })
 
-const blockHeights = ref<number[]>([])
 const blockEls = ref<(HTMLElement | null)[]>([])
 const paneInnerEls = ref<(HTMLElement | null)[][]>([])
 const paneHeights = ref<{left: number[]; right: number[]}[]>([])
+const singleHeights = ref<number[]>([])
 
 const setBlockRef = (el: unknown, index: number) => {
   blockEls.value[index] = el instanceof HTMLElement ? el : null
@@ -376,14 +376,9 @@ function updateLineHeights() {
       right: childMaxHeights(panes?.[1] ?? null),
     }
   })
-  blockHeights.value = lyricBlocks.value.map((block, index) => {
-    if (block.kind === 'split') {
-      const panes = paneHeights.value[index]
-      const all = [...(panes?.left ?? []), ...(panes?.right ?? [])]
-      return all.length ? Math.max(...all) : 0
-    }
-    return blockEls.value[index]?.offsetHeight || 0
-  })
+  singleHeights.value = lyricBlocks.value.map((block, index) =>
+    block.kind === 'single' ? blockEls.value[index]?.offsetHeight || 0 : 0,
+  )
 }
 
 watch(lyricBlocks, async () => {
@@ -391,17 +386,97 @@ watch(lyricBlocks, async () => {
   updateLineHeights()
 })
 
-function offsetForBlock(idx: number): number {
-  const prevHeights = blockHeights.value.slice(0, idx)
-  const sumPrev = prevHeights.reduce((a, b) => a + b, 0)
-  const currentHeight = blockHeights.value[idx] || 0
-  return centerOffset - (sumPrev + currentHeight / 2)
+function sumRange(heights: number[], start: number, end = heights.length): number {
+  return heights.slice(start, end).reduce((a, b) => a + b, 0)
 }
 
-function offsetAt(heights: number[], localIdx: number, viewport: number): number {
-  const sumPrev = heights.slice(0, localIdx).reduce((a, b) => a + b, 0)
-  const currentHeight = heights[localIdx] || 0
-  return viewport / 2 - (sumPrev + currentHeight / 2)
+function paneAnim(indices: number[]): {from: number; to: number; p: number} {
+  const local = currentLocalIndex(indices)
+  const tNow = currentTime.value
+  const checkLines = lines.value ?? []
+
+  if (local > 0) {
+    const currentLine = checkLines[indices[local] ?? -1]
+    if (currentLine) {
+      const incomingEnd = currentLine.timeInMs + 200
+      if (tNow < incomingEnd) {
+        const incomingStart = currentLine.timeInMs - 200
+        const p =
+          tNow <= incomingStart
+            ? 0
+            : easeProgress(tNow, incomingStart, incomingEnd)
+        return {from: local - 1, to: local, p}
+      }
+    }
+  }
+
+  const nextIndex = indices[local + 1]
+  const nextLine = nextIndex === undefined ? undefined : checkLines[nextIndex]
+  if (!nextLine) return {from: local, to: local, p: 0}
+
+  const animStart = nextLine.timeInMs - 200
+  const animEnd = nextLine.timeInMs + 200
+  if (tNow <= animStart) return {from: local, to: local, p: 0}
+  const p = tNow >= animEnd ? 1 : easeProgress(tNow, animStart, animEnd)
+  return {from: local, to: local + 1, p}
+}
+
+function paneConsumed(blockIndex: number, side: 'left' | 'right'): number {
+  const block = lyricBlocks.value[blockIndex]
+  if (!block || block.kind !== 'split') return 0
+  const heights = paneHeights.value[blockIndex]?.[side] ?? []
+  const {from, to, p} = paneAnim(block[side])
+  return sumRange(heights, 0, from) * (1 - p) + sumRange(heights, 0, to) * p
+}
+
+function paneRemaining(blockIndex: number, side: 'left' | 'right'): number {
+  const block = lyricBlocks.value[blockIndex]
+  if (!block || block.kind !== 'split') return 0
+  const heights = paneHeights.value[blockIndex]?.[side] ?? []
+  const {from, to, p} = paneAnim(block[side])
+  return sumRange(heights, from) * (1 - p) + sumRange(heights, to) * p
+}
+
+function paneCurrentHeight(blockIndex: number, side: 'left' | 'right'): number {
+  const block = lyricBlocks.value[blockIndex]
+  if (!block || block.kind !== 'split') return 0
+  const heights = paneHeights.value[blockIndex]?.[side] ?? []
+  const {from, to, p} = paneAnim(block[side])
+  return (heights[from] || 0) * (1 - p) + (heights[to] || 0) * p
+}
+
+function splitLayoutHeight(blockIndex: number): number {
+  return Math.max(
+    paneRemaining(blockIndex, 'left'),
+    paneRemaining(blockIndex, 'right'),
+  )
+}
+
+function splitFocusHeight(blockIndex: number): number {
+  return Math.max(
+    paneCurrentHeight(blockIndex, 'left'),
+    paneCurrentHeight(blockIndex, 'right'),
+  )
+}
+
+function blockLayoutHeight(index: number): number {
+  const block = lyricBlocks.value[index]
+  if (!block) return 0
+  if (block.kind === 'split') return splitLayoutHeight(index)
+  return singleHeights.value[index] || 0
+}
+
+function blockFocusHeight(index: number): number {
+  const block = lyricBlocks.value[index]
+  if (!block) return 0
+  if (block.kind === 'split') return splitFocusHeight(index)
+  return singleHeights.value[index] || 0
+}
+
+function offsetForBlock(idx: number): number {
+  let sumPrev = 0
+  for (let i = 0; i < idx; i++) sumPrev += blockLayoutHeight(i)
+  return centerOffset - (sumPrev + blockFocusHeight(idx) / 2)
 }
 
 function easeProgress(tNow: number, animStart: number, animEnd: number): number {
@@ -430,26 +505,7 @@ function currentLocalIndex(indices: number[]): number {
 }
 
 function paneOffsetAnimated(blockIndex: number, side: 'left' | 'right'): number {
-  const block = lyricBlocks.value[blockIndex]
-  if (!block || block.kind !== 'split') return 0
-
-  const indices = side === 'left' ? block.left : block.right
-  const heights = paneHeights.value[blockIndex]?.[side] ?? []
-  const viewport = blockHeights.value[blockIndex] || 0
-  const local = currentLocalIndex(indices)
-  const from = offsetAt(heights, local, viewport)
-
-  const nextIndex = indices[local + 1]
-  const nextLine = nextIndex === undefined ? undefined : lines.value?.[nextIndex]
-  if (!nextLine) return from
-
-  const animStart = nextLine.timeInMs - 200
-  const animEnd = nextLine.timeInMs + 200
-  const tNow = currentTime.value
-  if (tNow <= animStart) return from
-  const to = offsetAt(heights, local + 1, viewport)
-  if (tNow >= animEnd) return to
-  return from + (to - from) * easeProgress(tNow, animStart, animEnd)
+  return -paneConsumed(blockIndex, side)
 }
 
 const offsetY = computed(() => offsetForBlock(currentBlockIndex.value))
@@ -495,7 +551,7 @@ const offsetYAnimated = computed(() => {
         :key="'block-'+b"
         class="lyric-block"
         :class="{ 'lyric-split': block.kind === 'split' }"
-        :style="block.kind === 'split' && blockHeights[b] ? { height: blockHeights[b] + 'px' } : undefined"
+        :style="block.kind === 'split' && blockLayoutHeight(b) ? { height: blockLayoutHeight(b) + 'px' } : undefined"
         :ref="(el) => setBlockRef(el, b)"
       >
         <template v-if="block.kind === 'split'">
